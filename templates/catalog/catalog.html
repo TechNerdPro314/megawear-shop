@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Каталог товаров - MegaMart{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <!-- Заголовок и фильтрация -->
+  <div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+      <h1 class="h3 fw-bold mb-0">
+        {% if current_category %}{{ current_category.name }}{% elif current_brand %}{{ current_brand.name }}{% else %}Каталог{% endif %}
+      </h1>
+      {% if current_category and current_category.description %}
+        <p class="text-muted small mb-0 mt-1">{{ current_category.description|striptags|truncatewords:15 }}</p>
+      {% endif %}
+    </div>
+    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+      <form method="get" class="d-inline-flex gap-2 align-items-center">
+        <select name="ordering" class="form-select form-select-sm" onchange="this.form.submit()">
+          <option value="-id" {% if request.GET.ordering == '-id' %}selected{% endif %}>Сначала новые</option>
+          <option value="price" {% if request.GET.ordering == 'price' %}selected{% endif %}>Сначала дешевые</option>
+          <option value="-price" {% if request.GET.ordering == '-price' %}selected{% endif %}>Сначала дорогие</option>
+          <option value="name" {% if request.GET.ordering == 'name' %}selected{% endif %}>По названию</option>
+        </select>
+      </form>
+    </div>
+  </div>
+
+  <!-- Сетка товаров -->
+  {% if products %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+      {% for product in products %}
+        <div class="col">
+          {% include 'catalog/product_card.html' with product=product %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Пагинация -->
+    {% if is_paginated %}
+      <nav class="mt-5" aria-label="Навигация по страницам">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1{{ get_params }}">&laquo; Первая</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{{ get_params }}">&lsaquo;</a>
+            </li>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{{ get_params }}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}{{ get_params }}">&rsaquo;</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{{ get_params }}">Последняя &raquo;</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
+
+  {% else %}
+    <!-- Пустое состояние -->
+    <div class="text-center py-5">
+      <i class="bi bi-search display-1 text-muted mb-3"></i>
+      <h3 class="h4 mb-3">Товары не найдены</h3>
+      <p class="text-muted mb-4">Попробуйте изменить параметры поиска или сбросить фильтры.</p>
+      <a href="{% url 'catalog:product_list_all' %}" class="btn btn-primary">
+        <i class="bi bi-arrow-counterclockwise me-2"></i>Показать все товары
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% block title %}Личный кабинет - {{ user.get_full_name|default:user.username }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <!-- Заголовок -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+      <h1 class="h3 mb-1 fw-bold"><i class="bi bi-person-circle text-primary me-2"></i>Личный кабинет</h1>
+      <p class="text-muted mb-0">{{ user.get_full_name|default:user.username }}</p>
+    </div>
+    <a href="{% url 'users:profile_edit' %}" class="btn btn-primary">
+      <i class="bi bi-pencil-square me-2"></i>Редактировать профиль
+    </a>
+  </div>
+
+  <div class="row g-4">
+    
+    <!-- Боковая панель -->
+    <div class="col-lg-3">
+      <div class="profile-sidebar animate-fade-in-up">
+        <div class="text-center mb-4">
+          <div class="position-relative d-inline-block mb-3">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto" 
+                 style="width: 100px; height: 100px; font-size: 2.5rem;">
+              {{ user.first_name|default:user.username|first|upper }}
+            </div>
+            <span class="position-absolute bottom-0 end-0 badge bg-success rounded-circle p-2 border border-white">
+              <i class="bi bi-check-lg"></i>
+            </span>
+          </div>
+          <h5 class="mb-1">{{ user.get_full_name|default:user.username }}</h5>
+          <p class="text-muted small mb-3">{{ user.email }}</p>
+        </div>
+        
+        <div class="d-grid gap-2">
+          <a href="{% url 'orders:my_orders' %}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-box-seam me-2"></i>Мои заказы
+          </a>
+        </div>
+        
+        <hr class="my-4">
+        
+        <!-- Статистика -->
+        <h6 class="fw-bold mb-3"><i class="bi bi-graph-up me-2"></i>Статистика</h6>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted small">Заказов:</span>
+          <span class="fw-bold">{{ orders_count|default:0 }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-0">
+          <span class="text-muted small">На сумму:</span>
+          <span class="fw-bold">{{ total_spent|default:0|floatformat:0 }} ₽</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="col-lg-9">
+      
+      <!-- Личная информация -->
+      <div class="card border-0 shadow-sm rounded-3 animate-fade-in-up mb-4">
+        <div class="card-header bg-white border-bottom py-3">
+          <h5 class="mb-0 fw-bold"><i class="bi bi-person-lines-fill me-2"></i>Личная информация</h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="text-muted small d-block mb-1">Имя</label>
+              <p class="mb-0 fw-medium">{{ user.first_name|default:"Не указано" }}</p>
+            </div>
+            <div class="col-md-6">
+              <label class="text-muted small d-block mb-1">Фамилия</label>
+              <p class="mb-0 fw-medium">{{ user.last_name|default:"Не указано" }}</p>
+            </div>
+            <div class="col-md-6">
+              <label class="text-muted small d-block mb-1">Email</label>
+              <p class="mb-0 fw-medium">{{ user.email }}</p>
+            </div>
+            <div class="col-md-6">
+              <label class="text-muted small d-block mb-1">Телефон</label>
+              <p class="mb-0 fw-medium">{{ user.phone|default:"Не указан" }}</p>
+            </div>
+            <div class="col-md-6">
+              <label class="text-muted small d-block mb-1">Дата регистрации</label>
+              <p class="mb-0 fw-medium">{{ user.date_joined|date:"d.m.Y" }}</p>
+            </div>
+            <div class="col-md-6">
+              <label class="text-muted small d-block mb-1">Последний вход</label>
+              <p class="mb-0 fw-medium">{{ user.last_login|date:"d.m.Y H:i"|default:"—" }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Последние заказы -->
+      <div class="card border-0 shadow-sm rounded-3 animate-fade-in-up mb-4">
+        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history me-2"></i>Последние заказы</h5>
+          <a href="{% url 'orders:my_orders' %}" class="btn btn-sm btn-outline-primary">
+            Все заказы <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+        <div class="card-body p-0">
+          {% if recent_orders %}
+            <div class="table-responsive order-history">
+              <table class="table table-hover mb-0">
+                <thead class="bg-light">
+                  <tr>
+                    <th class="ps-4">№ Заказа</th>
+                    <th>Дата</th>
+                    <th>Сумма</th>
+                    <th>Статус</th>
+                    <th class="pe-4">Действие</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for order in recent_orders %}
+                    <tr>
+                      <td class="ps-4 fw-medium">#{{ order.id }}</td>
+                      <td>{{ order.created_at|date:"d.m.Y" }}</td>
+                      <td>{{ order.total_amount|default:0|floatformat:0 }} ₽</td>
+                      <td>
+                        {% if order.status == 'new' %}
+                          <span class="badge bg-info">Новый</span>
+                        {% elif order.status == 'confirmed' %}
+                          <span class="badge bg-primary">Подтверждён</span>
+                        {% elif order.status == 'paid' %}
+                          <span class="badge bg-success">Оплачен</span>
+                        {% elif order.status == 'processing' %}
+                          <span class="badge bg-warning text-dark">В обработке</span>
+                        {% elif order.status == 'shipped' %}
+                          <span class="badge bg-primary">Отправлен</span>
+                        {% elif order.status == 'delivered' %}
+                          <span class="badge bg-success">Доставлен</span>
+                        {% elif order.status == 'cancelled' %}
+                          <span class="badge bg-danger">Отменён</span>
+                        {% else %}
+                          <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+                        {% endif %}
+                      </td>
+                      <td class="pe-4 text-end">
+                        <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-sm btn-outline-secondary">
+                          <i class="bi bi-eye"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-center py-5">
+              <i class="bi bi-box-seam text-muted display-1 d-block mb-2"></i>
+              <p class="text-muted mb-3">У вас пока нет заказов</p>
+              <a href="{% url 'catalog:product_list_all' %}" class="btn btn-primary">
+                <i class="bi bi-cart-plus me-2"></i>Перейти к покупкам
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Настройки аккаунта -->
+      <div class="card border-0 shadow-sm rounded-3 animate-fade-in-up">
+        <div class="card-header bg-white border-bottom py-3">
+          <h5 class="mb-0 fw-bold"><i class="bi bi-gear me-2"></i>Настройки аккаунта</h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <a href="{% url 'users:password_change' %}" class="btn btn-outline-primary w-100 py-3">
+                <i class="bi bi-key d-block mb-2 fs-4"></i>
+                <span>Сменить пароль</span>
+              </a>
+            </div>
+            <div class="col-md-4">
+              <a href="{% url 'users:notifications' %}" class="btn btn-outline-secondary w-100 py-3">
+                <i class="bi bi-bell d-block mb-2 fs-4"></i>
+                <span>Уведомления</span>
+              </a>
+            </div>
+            <div class="col-md-4">
+              <button type="button" class="btn btn-outline-danger w-100 py-3" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                <i class="bi bi-trash d-block mb-2 fs-4"></i>
+                <span>Удалить аккаунт</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно удаления аккаунта (заглушка) -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Подтверждение удаления</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <p>Вы уверены, что хотите удалить аккаунт? Это действие необратимо.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+        <a href="{% url 'users:delete_account' %}" class="btn btn-danger">Удалить аккаунт</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

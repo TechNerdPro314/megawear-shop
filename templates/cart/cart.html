@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mb-4 text-white">ВАША <span class="text-lime">КОРЗИНА</span></h1>
+
+<div class="row">
+    <!-- Список товаров -->
+    <div class="col-lg-8 mb-4">
+        <div class="p-4" style="background: var(--panel); border: 1px solid var(--line);">
+            {% for item in cart %}
+            <div class="d-flex align-items-center mb-4 pb-4 border-bottom" style="border-color: var(--line) !important;">
+                {% if item.product.main_image %}
+                    <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" style="width: 80px; height: 80px; object-fit: cover; filter: grayscale(1); border: 1px solid var(--line);">
+                {% endif %}
+                <div class="ms-3 flex-grow-1">
+                    <h5 class="text-white m-0">{{ item.product.name }}</h5>
+                    <span class="text-muted small">{{ item.price }} ₽ / шт.</span>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <!-- AJAX-обновление количества -->
+                    <form action="{% url 'cart:update_cart' item.product.id %}" method="post" class="d-flex align-items-center ajax-update-cart">
+                        {% csrf_token %}
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="form-control text-center" style="width: 70px;">
+                    </form>
+                    <span class="text-lime fw-bold" style="min-width: 80px; text-align: right;">{{ item.total_price }} ₽</span>
+                    <!-- AJAX-удаление -->
+                    <form action="{% url 'cart:remove_from_cart' item.product.id %}" method="post" class="ajax-remove-cart">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">✕</button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-muted text-center my-4">Ваша корзина пуста.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Итоговая панель -->
+    <div class="col-lg-4">
+        <div class="p-4" style="background: var(--panel); border: 1px solid var(--lime);">
+            <h4 class="text-white mb-4">ИТОГО</h4>
+            
+            <!-- Купон -->
+            <form action="{% url 'cart:apply_coupon' %}" method="post" class="mb-3 ajax-apply-coupon">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" name="coupon" class="form-control" placeholder="Промокод">
+                    <button type="submit" class="btn btn-outline-lime">ОК</button>
+                </div>
+            </form>
+
+            <!-- Сводка (используем методы CartService) -->
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Товары:</span>
+                <span class="text-white">{{ cart.get_subtotal_price }} ₽</span>
+            </div>
+            {% if cart.get_discount_amount > 0 %}
+            <div class="d-flex justify-content-between mb-2 text-danger">
+                <span>Скидка:</span>
+                <span>-{{ cart.get_discount_amount }} ₽</span>
+            </div>
+            {% endif %}
+            <div class="d-flex justify-content-between mb-3">
+                <span class="text-muted">Доставка:</span>
+                <span class="text-white">{{ cart.get_delivery_cost }} ₽</span>
+            </div>
+            
+            <hr style="border-color: var(--line);">
+            
+            <div class="d-flex justify-content-between mb-4">
+                <span class="text-white fw-bold fs-5">К ОПЛАТЕ:</span>
+                <span class="text-lime fw-bold fs-4">{{ cart.get_final_price }} ₽</span>
+            </div>
+
+            <a href="{% url 'orders:checkout' %}" class="btn btn-lime w-100 py-3">ОФОРМИТЬ ЗАКАЗ</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

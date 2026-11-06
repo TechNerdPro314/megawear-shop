@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@400;500;700&display=swap');
+
+:root {
+    --bg: #080909;
+    --panel: #111212;
+    --white: #f7f7f4;
+    --muted: #a5a6a3;
+    --lime: #d7ff00;
+    --line: #30312d;
+    --bs-body-bg: var(--bg);
+    --bs-body-color: var(--white);
+    --bs-body-font-family: 'Roboto Condensed', sans-serif;
+}
+
+/* --- ГЛОБАЛЬНЫЙ СБРОС СТАРЫХ СТИЛЕЙ --- */
+body {
+    background-color: var(--bg) !important;
+    color: var(--white) !important;
+    font-family: 'Roboto Condensed', sans-serif !important;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Убиваем старые белые фоны и фоны Bootstrap */
+.bg-white, .bg-light, .bg-body, section, .container, .container-fluid {
+    background-color: transparent !important;
+}
+
+/* Убиваем старые цвета текста */
+.text-dark, .text-black {
+    color: var(--white) !important;
+}
+.text-muted {
+    color: var(--muted) !important;
+}
+
+/* --- ТИПОГРАФИКА --- */
+h1, h2, h3, h4, h5, h6, .page-title {
+    font-family: 'Oswald', sans-serif !important;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--white) !important;
+}
+
+h1 em, h2 em, .text-lime { 
+    font-style: normal; 
+    color: var(--lime) !important; 
+}
+
+a { 
+    color: var(--lime) !important; 
+    text-decoration: none !important; 
+    transition: 0.2s; 
+}
+a:hover { 
+    color: var(--white) !important; 
+}
+
+/* --- КНОПКИ --- */
+.btn-lime, .btn-primary {
+    background-color: var(--lime) !important;
+    color: #080909 !important;
+    font-weight: 800;
+    border-radius: 4px;
+    border: 1px solid var(--lime) !important;
+    text-transform: uppercase;
+    padding: 12px 24px;
+    transition: all 0.2s;
+    font-family: 'Roboto Condensed', sans-serif;
+    letter-spacing: 0.5px;
+}
+.btn-lime:hover, .btn-primary:hover {
+    background-color: transparent !important;
+    color: var(--lime) !important;
+}
+
+.btn-outline-lime {
+    background-color: transparent !important;
+    color: var(--lime) !important;
+    border: 1px solid var(--lime) !important;
+    border-radius: 4px;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+.btn-outline-lime:hover {
+    background-color: var(--lime) !important;
+    color: #080909 !important;
+}
+
+/* --- ФОРМЫ --- */
+.form-control, .form-select {
+    background-color: var(--panel) !important;
+    border: 1px solid var(--line) !important;
+    color: var(--white) !important;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--lime) !important;
+    box-shadow: 0 0 0 0.25rem rgba(215, 255, 0, 0.25) !important;
+}
+
+/* --- ШАПКА --- */
+.site-header {
+    border-bottom: 1px solid var(--line) !important;
+    background-color: var(--bg) !important;
+}
+.nav-link {
+    color: var(--white) !important;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+.nav-link:hover, .nav-link.active { 
+    color: var(--lime) !important; 
+}
+
+.top-bar {
+    background: var(--lime) !important;
+    color: #080909 !important;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 8px 0;
+}
+
+/* --- КАРТОЧКИ ТОВАРОВ --- */
+.product-card {
+    background-color: var(--panel) !important;
+    border: 1px solid var(--line) !important;
+    transition: transform 0.2s, border-color 0.2s;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.product-card:hover { 
+    border-color: var(--lime) !important; 
+    transform: translateY(-2px); 
+}
+.product-card img {
+    filter: grayscale(1);
+    transition: filter 0.3s;
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border-bottom: 1px solid var(--line);
+}
+.product-card:hover img { 
+    filter: grayscale(0); 
+}
+.product-card .card-body { 
+    padding: 15px; 
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-between; 
+}
+.product-card .price { 
+    font-size: 1.25rem; 
+    font-weight: 700; 
+    color: var(--lime) !important; 
+}
+
+/* --- ХЛЕБНЫЕ КРОШКИ --- */
+.breadcrumbs { 
+    font-size: 13px; 
+    color: var(--muted) !important; 
+    margin-bottom: 25px; 
+}
+.breadcrumbs a { 
+    color: var(--lime) !important; 
+}
+.breadcrumbs a:hover { 
+    text-decoration: underline !important; 
+}

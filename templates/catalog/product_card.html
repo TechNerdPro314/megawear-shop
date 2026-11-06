@@ -1,0 +1,93 @@
+{% comment %}
+  product_card.html
+  Использование: {% include 'catalog/product_card.html' with product=product %}
+{% endcomment %}
+
+<article class="product-card h-100 d-flex flex-column position-relative">
+  <div class="position-absolute top-0 start-0 p-2 z-2">
+    {% if not product.is_active or product.stock == 0 %}
+      <span class="badge bg-danger shadow-sm">Нет в наличии</span>
+    {% elif product.stock < 10 %}
+      <span class="badge bg-warning text-dark shadow-sm">Мало: {{ product.stock }} шт.</span>
+    {% elif product.is_featured %}
+      <span class="badge bg-primary shadow-sm">Хит</span>
+    {% endif %}
+  </div>
+
+  <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-dark flex-grow-1">
+    <div class="product-card__image-wrapper bg-light rounded-top overflow-hidden d-flex align-items-center justify-content-center">
+      {% if product.main_image %}
+        <img src="{{ product.main_image.url }}" 
+             alt="{{ product.name }}" 
+             class="img-fluid p-3 transition-transform"
+             style="max-height: 200px; object-fit: contain;"
+             loading="lazy">
+      {% else %}
+        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+      {% endif %}
+    </div>
+    
+    <div class="product-card__body p-3">
+      {% if product.brand %}
+        <small class="text-muted d-block mb-1">{{ product.brand.name }}</small>
+      {% endif %}
+      <h6 class="product-card__title fw-bold mb-2 text-truncate-2 lh-sm">{{ product.name }}</h6>
+      
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="product-card__price fw-bold fs-5 text-primary">
+          {{ product.price|floatformat:0 }} <small class="fs-6">₽</small>
+        </div>
+        {% if avg_rating %}
+          <div class="product-card__rating text-warning small">
+            <i class="bi bi-star-fill"></i> {{ avg_rating|floatformat:1 }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </a>
+
+  <div class="product-card__footer p-3 pt-0 mt-auto">
+    <form method="post" action="{% url 'cart:add_to_cart' product.id %}" class="d-grid">
+      {% csrf_token %}
+      <input type="hidden" name="quantity" value="1">
+      <button type="submit" 
+              class="btn btn-primary btn-sm w-100 {% if product.stock == 0 %}disabled{% endif %}"
+              {% if product.stock == 0 %}disabled{% endif %}>
+        {% if product.stock > 0 %}
+          <i class="bi bi-cart-plus me-1"></i> В корзину
+        {% else %}
+          <i class="bi bi-ban me-1"></i> Нет в наличии
+        {% endif %}
+      </button>
+    </form>
+  </div>
+</article>
+
+<style>
+  .product-card {
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease-in-out;
+    background: #fff;
+  }
+  .product-card:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+  }
+  .product-card__image-wrapper {
+    aspect-ratio: 1/1;
+  }
+  .text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .transition-transform {
+    transition: transform 0.3s;
+  }
+  .product-card:hover .transition-transform {
+    transform: scale(1.05);
+  }
+</style>

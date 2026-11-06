@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Заказ #{{ order.id }} — MegaMart</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; padding: 20px;">
+    <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+        
+        <!-- Header -->
+        <div style="background: #0d6efd; color: white; padding: 25px 30px; text-align: center;">
+            <h1 style="margin: 0; font-size: 24px;">MegaMart</h1>
+        </div>
+        
+        <!-- Body -->
+        <div style="padding: 30px;">
+            <h2 style="color: #0d6efd; margin-top: 0;">Спасибо за ваш заказ!</h2>
+            
+            <p>Уважаемый(ая) <strong>{{ order.customer_name }}</strong>!</p>
+            
+            <p>Ваш заказ <strong>#{{ order.id }}</strong> успешно оформлен и принят в обработку.</p>
+            
+            <!-- Order Details -->
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="margin-top: 0; font-size: 16px;">Детали заказа</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 6px 0;"><strong>Статус:</strong></td>
+                        <td style="padding: 6px 0;">{{ order.get_status_display }}</td>
+                    </tr>
+                    {% if order.delivery_method %}
+                    <tr>
+                        <td style="padding: 6px 0;"><strong>Способ доставки:</strong></td>
+                        <td style="padding: 6px 0;">{{ order.get_delivery_method_display }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if order.delivery_address %}
+                    <tr>
+                        <td style="padding: 6px 0;"><strong>Адрес доставки:</strong></td>
+                        <td style="padding: 6px 0;">{{ order.delivery_address }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if order.comment %}
+                    <tr>
+                        <td style="padding: 6px 0;"><strong>Комментарий:</strong></td>
+                        <td style="padding: 6px 0;">{{ order.comment }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+            
+            <!-- Items Table -->
+            <h3 style="font-size: 16px;">Товары в заказе:</h3>
+            <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+                <thead>
+                    <tr style="background: #f8f9fa;">
+                        <th style="padding: 8px; text-align: left;">Товар</th>
+                        <th style="padding: 8px; text-align: center;">Кол-во</th>
+                        <th style="padding: 8px; text-align: right;">Сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #eee;">{{ item.product_name }}</td>
+                        <td style="padding: 8px 0; text-align: center; border-bottom: 1px solid #eee;">{{ item.quantity }}</td>
+                        <td style="padding: 8px 0; text-align: right; border-bottom: 1px solid #eee;">{{ item.total_price }} ₽</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <!-- Totals -->
+            <div style="background: #e9ecef; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Подытог:</span>
+                    <span>{{ order.subtotal_amount|default:0 }} ₽</span>
+                </div>
+                {% if order.coupon_code %}
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Скидка по купону ({{ order.coupon_code }}):</span>
+                    <span style="color: #28a745;">-{{ order.discount_amount|default:0 }} ₽</span>
+                </div>
+                {% endif %}
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Доставка:</span>
+                    <span>{{ order.delivery_cost|default:0 }} ₽</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-top: 8px; padding-top: 8px; border-top: 1px solid #ccc;">
+                    <span>Итого к оплате:</span>
+                    <span>{{ order.total_amount }} ₽</span>
+                </div>
+            </div>
+            
+            <!-- Payment info -->
+            {% if order.status == 'new' or order.status == 'confirmed' %}
+            <p style="background: #fff3cd; padding: 10px; border-radius: 5px;">
+                ⚠️ Заказ ожидает оплаты. Вы можете оплатить его в личном кабинете.
+            </p>
+            {% endif %}
+            
+            <!-- Contact info -->
+            <p style="color: #666; margin-bottom: 5px;">
+                Менеджер свяжется с вами по телефону <strong>{{ order.customer_phone }}</strong> для подтверждения заказа.
+            </p>
+            <p style="color: #666; font-size: 14px; margin-top: 15px;">
+                Спасибо за выбор MegaMart!<br>
+                Если у вас возникли вопросы, напишите нам на {{ settings.DEFAULT_FROM_EMAIL }}
+            </p>
+        </div>
+        
+        <!-- Footer -->
+        <div style="background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #999;">
+            © {{ current_year|default:"2026" }} MegaMart. Все права защищены.
+        </div>
+    </div>
+</body>
+</html>

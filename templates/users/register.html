@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Регистрация — MegaWear{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center py-5">
+    <div class="col-md-8 col-lg-7 col-xl-6">
+      
+      <!-- Register Card -->
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden" style="background: var(--panel); border: 1px solid var(--line) !important;">
+        <div class="card-header text-center py-4" style="background: var(--bg); border-bottom: 1px solid var(--line);">
+          <div class="mb-3">
+            <i class="bi bi-person-plus-fill text-lime" style="font-size: 3rem;"></i>
+          </div>
+          <h3 class="card-title mb-1 fw-bold text-white" style="font-family: 'Oswald';">СОЗДАТЬ АККАУНТ</h3>
+          <p class="mb-0 text-muted">Присоединяйтесь к MegaWear</p>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+          <form method="post" action="{% url 'users:register' %}" novalidate id="registerForm">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger" style="background: #2a1111; border-color: #ff4444; color: #ff4444;">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <!-- Django сам отрисует ВСЕ поля формы (username, email, phone и т.д.) -->
+            {% for field in form %}
+              <div class="mb-3">
+                <label class="form-label fw-semibold text-white">
+                  {{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                  <div class="form-text text-muted" style="font-size: 0.75rem;">{{ field.help_text|safe }}</div>
+                {% endif %}
+                {% if field.errors %}
+                  <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
+                {% endif %}
+              </div>
+            {% endfor %}
+
+            <!-- Если в форме есть поле terms, оно выведется выше. Если оно валидируется на бэкенде вручную, можно оставить чекбокс здесь -->
+
+            <button type="submit" class="btn btn-lime w-100 py-3 mb-3 mt-4 fw-semibold">
+              <i class="bi bi-check-circle me-2"></i>Создать аккаунт
+            </button>
+
+            <div class="text-center">
+              <p class="mb-0 text-muted">
+                Уже есть аккаунт? 
+                <a href="{% url 'users:login' %}" class="text-lime fw-semibold text-decoration-none">
+                  Войти
+                </a>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // Добавляем стили ко всем полям, которые отрисовал Django
+  document.addEventListener("DOMContentLoaded", function() {
+    // Находим все инпуты (кроме чекбоксов) внутри формы регистрации
+    document.querySelectorAll('#registerForm input:not([type="checkbox"]), #registerForm select, #registerForm textarea').forEach(function(input) {
+      input.classList.add('form-control', 'form-control-lg');
+      input.style.backgroundColor = '#080909';
+      input.style.color = '#fff';
+      input.style.border = '1px solid #30312d';
+    });
+    
+    // Стилизуем чекбоксы (если они есть в форме)
+    document.querySelectorAll('#registerForm input[type="checkbox"]').forEach(function(input) {
+      input.classList.add('form-check-input');
+    });
+  });
+</script>
+{% endblock %}

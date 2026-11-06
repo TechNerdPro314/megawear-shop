@@ -1,0 +1,101 @@
+services:
+  - type: web
+    name: megamart-web
+    env: docker
+    dockerfilePath: ./docker/django.Dockerfile   # или ./Dockerfile, смотря как у вас
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: megamart-web.onrender.com
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: megamart-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: megamart-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: megamart-db
+          property: password
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: megamart-db
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: megamart-db
+          property: port
+      - key: REDIS_HOST
+        value: your-redis-host   # см. п. 4
+      - key: REDIS_PORT
+        value: 6379
+      - key: CELERY_BROKER_URL
+        value: redis://your-redis-host:6379/0
+      - key: CELERY_RESULT_BACKEND
+        value: redis://your-redis-host:6379/1
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: EMAIL_USE_TLS
+        value: True
+      - key: YOOKASSA_SHOP_ID
+        sync: false
+      - key: YOOKASSA_SECRET_KEY
+        sync: false
+      - key: SITE_NAME
+        value: MegaMart
+      - key: SITE_URL
+        value: https://megamart-web.onrender.com
+
+  - type: worker
+    name: megamart-celery
+    env: docker
+    dockerfilePath: ./docker/celery.Dockerfile
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        generateValue: true
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: megamart-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: megamart-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: megamart-db
+          property: password
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: megamart-db
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: megamart-db
+          property: port
+      - key: REDIS_HOST
+        value: your-redis-host
+      - key: REDIS_PORT
+        value: 6379
+      - key: CELERY_BROKER_URL
+        value: redis://your-redis-host:6379/0
+      - key: CELERY_RESULT_BACKEND
+        value: redis://your-redis-host:6379/1
+
+databases:
+  - name: megamart-db
+    databaseName: megamart
+    plan: free   # бесплатный PostgreSQL

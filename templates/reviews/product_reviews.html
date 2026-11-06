@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Отзывы: {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  
+  <!-- Header & Stats -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-muted small mb-1 d-block">
+            <i class="bi bi-arrow-left me-1"></i>Вернуться к товару
+          </a>
+          <h2 class="mb-1 fw-bold">Отзывы на {{ product.name }}</h2>
+        </div>
+        
+        {% if user.is_authenticated and not has_reviewed %}
+          <a href="{% url 'reviews:add_review' product.id %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Написать отзыв
+          </a>
+        {% elif not user.is_authenticated %}
+          <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-outline-primary">
+            Войти, чтобы оставить отзыв
+          </a>
+        {% else %}
+          <span class="badge bg-success fs-6"><i class="bi bi-check-circle me-1"></i>Вы уже оставили отзыв</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if reviews %}
+    <div class="row g-4">
+      {% for review in reviews %}
+        <div class="col-12">
+          <div class="card border-0 shadow-sm rounded-3 p-3">
+            <div class="d-flex gap-3">
+              
+              <!-- Avatar -->
+              <div class="flex-shrink-0">
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-primary fw-bold" 
+                     style="width: 50px; height: 50px; font-size: 1.2rem;">
+                  {{ review.user.first_name|default:"P"|first|upper }}
+                </div>
+              </div>
+
+              <!-- Content -->
+              <div class="w-100">
+                <div class="d-flex justify-content-between align-items-start flex-wrap">
+                  <div>
+                    <h6 class="fw-bold mb-1">{{ review.user.get_full_name|default:review.user.username }}</h6>
+                    <div class="text-warning small mb-2">
+                      {% for i in "12345"|make_list %}
+                        {% if forloop.counter <= review.rating %}
+                          <i class="bi bi-star-fill"></i>
+                        {% else %}
+                          <i class="bi bi-star"></i>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ review.created_at|date:"d E Y" }}</small>
+                </div>
+
+                <p class="mb-0 text-dark">{{ review.text|linebreaks }}</p>
+
+                {% if review.is_verified_purchase %}
+                  <span class="badge bg-light text-success border border-success mt-2">
+                    <i class="bi bi-check2-all me-1"></i>Подтвержденная покупка
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- No Reviews -->
+    <div class="text-center py-5">
+      <i class="bi bi-chat-square fs-1 text-muted d-block mb-3"></i>
+      <h5 class="text-secondary">Отзывов пока нет</h5>
+      <p class="text-muted">Станьте первым, кто оставит отзыв об этом товаре!</p>
+      {% if user.is_authenticated %}
+        <a href="{% url 'reviews:add_review' product.id %}" class="btn btn-outline-primary mt-2">Написать отзыв</a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

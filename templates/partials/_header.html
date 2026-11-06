@@ -1,0 +1,102 @@
+{% load static %}
+
+<header class="navbar-megamart sticky-top">
+  <div class="container">
+    <nav class="navbar navbar-expand-lg">
+      
+      <!-- Logo -->
+      <a class="navbar-brand" href="{% url 'catalog:home' %}">
+        <i class="bi bi-house-heart-fill me-2"></i>MegaMart
+      </a>
+      
+      <!-- Mobile Toggle -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+              data-bs-target="#navbarMain" aria-controls="navbarMain" 
+              aria-expanded="false" aria-label="Переключить навигацию">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <!-- Navigation -->
+      <div class="collapse navbar-collapse" id="navbarMain">
+        
+        <!-- Search -->
+        <form class="d-flex mx-lg-4 my-2 my-lg-0" role="search" 
+              action="{% url 'catalog:product_list_all' %}" method="get">
+          <div class="input-group">
+            <input class="form-control" type="search" name="q" 
+                   placeholder="Поиск товаров..." aria-label="Поиск"
+                   value="{{ request.GET.q|default:'' }}">
+            <button class="btn btn-outline-primary" type="submit" aria-label="Поиск">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+        </form>
+        
+        <!-- Main Menu -->
+        <ul class="navbar-nav mx-lg-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
+               href="{% url 'catalog:home' %}">Главная</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'product_list_all' %}active{% endif %}" 
+               href="{% url 'catalog:product_list_all' %}">Каталог</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'info_promo' %}active{% endif %}" 
+               href="{% url 'info_promo' %}">Акции</a>
+          </li>
+        </ul>
+        
+        <!-- User Actions -->
+        <div class="d-flex align-items-center gap-2">
+          {% if user.is_authenticated %}
+            <!-- Уведомления -->
+            <a href="{% url 'users:notifications' %}" 
+               class="btn btn-outline-secondary btn-sm position-relative" 
+               title="Уведомления">
+              <i class="bi bi-bell"></i>
+              {% if unread_notifications_count %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.7rem;">
+                  {{ unread_notifications_count }}
+                </span>
+              {% endif %}
+            </a>
+
+            <a href="{% url 'users:profile' %}" class="btn btn-outline-secondary btn-sm d-none d-lg-inline-flex">
+              <i class="bi bi-person me-1"></i>{{ user.first_name|default:user.username }}
+            </a>
+            <form method="post" action="{% url 'users:logout' %}" class="d-none d-lg-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-link btn-sm text-decoration-none p-0">
+                Выйти
+              </button>
+            </form>
+          {% else %}
+            <a href="{% url 'users:login' %}" class="btn btn-outline-primary btn-sm">Войти</a>
+            <a href="{% url 'users:register' %}" class="btn btn-primary btn-sm d-none d-lg-inline-flex">Регистрация</a>
+          {% endif %}
+          
+          <!-- Сравнение -->
+          <a href="{% url 'comparison:compare' %}" class="btn btn-outline-secondary btn-sm position-relative" title="Сравнение товаров">
+            <i class="bi bi-bar-chart"></i>
+            {% if comparison_count %}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.7rem;">
+                {{ comparison_count }}
+              </span>
+            {% endif %}
+          </a>
+          
+          <!-- Cart -->
+          <a href="{% url 'cart:cart_detail' %}" class="btn btn-primary position-relative" aria-label="Корзина">
+            <i class="bi bi-cart3"></i>
+            {% if global_cart and global_cart.get_total_quantity > 0 %}
+              <span class="cart-badge bg-danger text-white">{{ global_cart.get_total_quantity }}</span>
+            {% endif %}
+          </a>
+        </div>
+        
+      </div>
+    </nav>
+  </div>
+</header>

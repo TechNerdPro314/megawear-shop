@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row g-4">
+    
+    <!-- Галерея товара -->
+    <div class="col-lg-6">
+      <div class="product-detail-image mb-3" id="mainImageContainer">
+        {% if product.main_image %}
+          <img src="{{ product.main_image.url }}" alt="{{ product.name }}" id="mainImage" class="w-100 h-auto rounded-3" style="max-height:450px; object-fit:contain;">
+        {% else %}
+          <div class="d-flex align-items-center justify-content-center bg-light rounded-3" style="height:450px;">
+            <i class="bi bi-image fs-1 text-muted"></i>
+          </div>
+        {% endif %}
+      </div>
+      {% if product.images.all %}
+        <div class="d-flex gap-2 flex-wrap">
+          {% for image in product.images.all %}
+            <button class="btn btn-outline-secondary p-0 border-0 rounded-2 overflow-hidden{% if image.is_main %} border-primary border-2{% endif %}"
+                    onclick="changeMainImage(this, '{{ image.image.url }}')"
+                    type="button" aria-label="Показать изображение {{ forloop.counter }}">
+              <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" width="60" height="60" loading="lazy" style="object-fit:cover;">
+            </button>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Информация о товаре -->
+    <div class="col-lg-6">
+      {% if product.brand %}
+        <p class="text-muted mb-1">
+          <i class="bi bi-tag me-1"></i>
+          <a href="{{ product.brand.get_absolute_url }}" class="text-decoration-none text-primary">{{ product.brand.name }}</a>
+        </p>
+      {% endif %}
+      
+      <h1 class="h2 mb-2">{{ product.name }}</h1>
+      
+      {% if avg_rating %}
+        <div class="star-rating mb-3">
+          {% for i in "12345"|make_list %}
+            <i class="bi bi-star{% if forloop.counter <= avg_rating|floatformat:0 %}-fill{% endif %}"></i>
+          {% endfor %}
+          <span class="text-muted ms-2 small">{{ avg_rating|floatformat:1 }} ({{ total_reviews }} отзывов)</span>
+        </div>
+      {% endif %}
+      
+      <!-- Цена (синяя) -->
+      <p class="product-detail-price mb-3">{{ product.price|floatformat:0 }} ₽</p>
+      
+      <!-- Статус наличия -->
+      <div class="mb-3">
+        {% if product.stock > 10 %}
+          <span class="badge bg-success fs-6"><i class="bi bi-check-circle me-1"></i>В наличии: {{ product.stock }} шт.</span>
+        {% elif product.stock > 0 %}
+          <span class="badge bg-warning text-dark fs-6"><i class="bi bi-exclamation-circle me-1"></i>Осталось: {{ product.stock }} шт.</span>
+        {% else %}
+          <span class="badge bg-danger fs-6"><i class="bi bi-x-circle me-1"></i>Нет в наличии</span>
+        {% endif %}
+      </div>
+      
+      <!-- Добавление в корзину -->
+      <form method="post" action="{% url 'cart:add_to_cart' product.id %}" class="d-flex gap-2 align-items-center flex-wrap">
+        {% csrf_token %}
+        <div class="input-group input-group-sm" style="width:120px;">
+          <button type="button" class="btn btn-outline-secondary" onclick="updateQty(-1)">−</button>
+          <input type="number" class="form-control text-center" name="quantity" id="qtyInput" value="1" min="1" max="{{ product.stock }}" required>
+          <button type="button" class="btn btn-outline-secondary" onclick="updateQty(1)">+</button>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg" {% if product.stock == 0 %}disabled{% endif %}>
+          <i class="bi bi-cart-plus me-2"></i>
+          {% if product.stock > 0 %}В корзину{% else %}Нет в наличии{% endif %}
+        </button>
+      </form>
+
+      <!-- Кнопка сравнения -->
+      <form method="post" action="{% url 'comparison:add_to_comparison' product.id %}" class="mt-2">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-secondary">
+          <i class="bi bi-bar-chart me-1"></i> Сравнить
+        </button>
+      </form>
+      
+      <!-- Описание -->
+      <div class="mt-4">
+        {% if product.short_description %}
+          <p class="text-secondary">{{ product.short_description }}</p>
+        {% endif %}
+        {% if product.description %}
+          <div class="product-description">
+            {{ product.description|safe }}
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- Характеристики -->
+      {% if product.attribute_values.all %}
+        <div class="mt-4">
+          <h4>Характеристики</h4>
+          <dl class="row">
+            {% for attr in product.attribute_values.all %}
+              <dt class="col-sm-4 fw-medium">{{ attr.attribute.name }}</dt>
+              <dd class="col-sm-8 text-muted">{{ attr.value }}</dd>
+            {% endfor %}
+          </dl>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  
+  <!-- Похожие товары -->
+  {% if related_products %}
+    <section class="mt-5">
+      <h3 class="h4 mb-3">С этим товаром покупают</h3>
+      <div class="product-grid">
+        {% for related in related_products %}
+          {% include 'partials/_product_card.html' with product=related %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- Отзывы -->
+  <section class="reviews-section mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="h4 mb-1"><i class="bi bi-chat-square-text me-2"></i>Отзывы покупателей</h3>
+        {% if total_reviews > 0 %}
+          <div class="d-flex align-items-center">
+            <div class="star-rating me-2">
+              {% for i in "12345"|make_list %}
+                <i class="bi bi-star-fill{% if forloop.counter > avg_rating|floatformat:0 %} empty-star{% endif %}"></i>
+              {% endfor %}
+            </div>
+            <span class="fw-bold">{{ avg_rating|floatformat:1 }}</span>
+            <span class="text-muted ms-1">• {{ total_reviews }} отзывов</span>
+          </div>
+        {% endif %}
+      </div>
+      
+      {% if user.is_authenticated %}
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+          <i class="bi bi-pencil-square me-2"></i>Написать отзыв
+        </button>
+      {% endif %}
+    </div>
+    
+    {% if reviews %}
+      {% for review in reviews %}
+        <div class="review-card bg-white p-3 mb-3">
+          <div class="d-flex align-items-start">
+            <div class="review-avatar me-3 flex-shrink-0">
+              {{ review.user.get_full_name|default:review.user.username|first|upper }}
+            </div>
+            <div class="flex-grow-1">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <h6 class="mb-0 fw-semibold">{{ review.user.get_full_name|default:review.user.username }}</h6>
+                <small class="text-muted">{{ review.created_at|date:"d.m.Y" }}</small>
+              </div>
+              <div class="star-rating mb-2">
+                {% for i in "12345"|make_list %}
+                  <i class="bi bi-star-fill{% if forloop.counter > review.rating %} empty-star{% endif %}"></i>
+                {% endfor %}
+              </div>
+              {% if review.title %}
+                <h6 class="fw-bold">{{ review.title }}</h6>
+              {% endif %}
+              <p class="mb-2">{{ review.text }}</p>
+              {% if review.is_verified_purchase %}
+                <span class="badge bg-success-light text-success"><i class="bi bi-check-circle me-1"></i>Подтверждённая покупка</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="text-center py-4 text-muted">
+        <i class="bi bi-chat-square-text display-1 d-block mb-3"></i>
+        <p>Пока нет отзывов. Ваш отзыв будет первым!</p>
+      </div>
+    {% endif %}
+    
+    {% if not user.is_authenticated %}
+      <div class="text-center mt-4 p-4 bg-white rounded-3 border">
+        <i class="bi bi-lock fs-4 text-muted d-block mb-2"></i>
+        <p class="mb-2">Чтобы оставить отзыв, необходимо авторизоваться</p>
+        <a href="{% url 'users:login' %}" class="btn btn-outline-primary me-2">Войти</a>
+        <a href="{% url 'users:register' %}" class="btn btn-primary">Зарегистрироваться</a>
+      </div>
+    {% endif %}
+  </section>
+</div>
+
+<!-- Модальное окно: написание отзыва -->
+{% if user.is_authenticated %}
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'reviews:add_review' product.id %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="reviewModalLabel"><i class="bi bi-pencil-square me-2"></i>Ваш отзыв</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Оценка</label>
+            {{ review_form.rating }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Заголовок</label>
+            {{ review_form.title }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Отзыв</label>
+            {{ review_form.text }}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary"><i class="bi bi-send me-2"></i>Отправить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function changeMainImage(btn, src) {
+  document.getElementById('mainImage').src = src;
+  // Убираем выделение со всех кнопок, добавляем текущей
+  document.querySelectorAll('.btn-outline-secondary').forEach(b => {
+    b.classList.remove('border-primary', 'border-2');
+  });
+  btn.classList.add('border-primary', 'border-2');
+}
+
+function updateQty(change) {
+  const input = document.getElementById('qtyInput');
+  const val = parseInt(input.value, 10);
+  const max = parseInt(input.max, 10) || 999;
+  const newVal = val + change;
+  if (newVal >= 1 && newVal <= max) {
+    input.value = newVal;
+  }
+}
+</script>
+{% endblock %}

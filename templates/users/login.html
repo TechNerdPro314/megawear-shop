@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Вход в аккаунт — MegaWear{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center align-items-center min-vh-75 py-5">
+    <div class="col-md-6 col-lg-5">
+      
+      <!-- Login Card -->
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden" style="background: var(--panel); border: 1px solid var(--line) !important;">
+        <!-- Header -->
+        <div class="card-header text-center py-4" style="background: var(--bg); border-bottom: 1px solid var(--line);">
+          <div class="mb-3">
+            <i class="bi bi-person-circle text-lime" style="font-size: 3rem;"></i>
+          </div>
+          <h3 class="card-title mb-1 fw-bold text-white" style="font-family: 'Oswald';">С ВОЗВРАЩЕНИЕМ!</h3>
+          <p class="mb-0 text-muted">Войдите в свой аккаунт</p>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+          <form method="post" action="{% url 'users:login' %}" novalidate id="loginForm">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger" style="background: #2a1111; border-color: #ff4444; color: #ff4444;">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            {% if next %}
+              <input type="hidden" name="next" value="{{ next }}">
+            {% endif %}
+
+            <!-- Django сам отрисует поля с правильными name -->
+            {% for field in form %}
+              <div class="mb-3">
+                <label class="form-label fw-semibold text-white">
+                  <i class="bi bi-person me-1 text-lime"></i>{{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                  <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
+                {% endif %}
+              </div>
+            {% endfor %}
+
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                <label class="form-check-label text-muted" for="remember">Запомнить меня</label>
+              </div>
+              <!-- Если роут password_reset существует, раскомментируйте -->
+              <!-- <a href="{% url 'users:password_reset' %}" class="text-lime text-decoration-none small">Забыли пароль?</a> -->
+            </div>
+
+            <button type="submit" class="btn btn-lime w-100 py-3 mb-3 fw-semibold">
+              <i class="bi bi-box-arrow-in-right me-2"></i>Войти
+            </button>
+
+            <div class="text-center">
+              <p class="mb-0 text-muted">
+                Ещё нет аккаунта? 
+                <a href="{% url 'users:register' %}" class="text-lime fw-semibold text-decoration-none">
+                  Зарегистрироваться
+                </a>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // Добавляем стили ко всем полям, которые отрисовал Django
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('#loginForm input[type="text"], #loginForm input[type="password"], #loginForm input[type="email"]').forEach(function(input) {
+      input.classList.add('form-control', 'form-control-lg');
+      input.style.backgroundColor = '#080909';
+      input.style.color = '#fff';
+      input.style.border = '1px solid #30312d';
+    });
+  });
+</script>
+<style>
+.min-vh-75 { min-height: 75vh; }
+</style>
+{% endblock %}

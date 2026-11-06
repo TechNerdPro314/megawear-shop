@@ -1,0 +1,35 @@
+# MegaMart robots.txt
+# Этот файл генерируется динамически через views.py, но здесь приведён пример
+
+# Разрешаем всем роботам
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://megamart.ru/sitemap.xml
+
+# Запрещаем индексацию служебных разделов
+Disallow: /admin/
+Disallow: /cart/
+Disallow: /orders/
+Disallow: /users/
+Disallow: /payments/
+Disallow: /importer/
+Disallow: /promotions/
+Disallow: /media/
+Disallow: /static/
+Disallow: /ht/
+
+# Запрещаем индексацию сессий и параметров
+Disallow: /*?*
+Disallow: /*sessionid=
+Disallow: /*utm_
+
+# Разрешаем доступ к полезным ресурсам
+Allow: /media/products/
+Allow: /static/css/
+Allow: /static/js/
+Allow: /static/images/
+
+# Host (для Яндекса)
+Host: https://megamart.ru

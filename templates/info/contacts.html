@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Контакты - MegaMart{% endblock %}
+
+{% block content %}
+<div class="container">
+  
+  <!-- Хлебные крошки -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'catalog:home' %}">Главная</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Контакты</li>
+    </ol>
+  </nav>
+
+  <h1 class="h3 mb-4"><i class="bi bi-geo-alt me-2"></i>Контакты</h1>
+
+  <!-- Карта -->
+  <div class="rounded-3 overflow-hidden shadow-sm mb-4" style="height: 350px;">
+    <iframe src="https://yandex.ru/map-widget/v1/?ll=37.618423%2C55.751244&z=14&pt=37.618423,55.751244,pm2rdm&l=map" 
+            width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen="" 
+            title="Карта проезда">
+    </iframe>
+  </div>
+
+  <!-- Контактные данные -->
+  <div class="row g-3">
+    <div class="col-md-6 col-lg-3">
+      <div class="bg-white rounded-3 p-3 border shadow-sm h-100">
+        <i class="bi bi-geo-alt fs-3 text-primary mb-2"></i>
+        <h5 class="mb-1">Адрес</h5>
+        <p class="text-muted mb-0">
+          г. Москва,<br>
+          ул. Примерная, д. 123<br>
+          <small>(метро Примерная, выход 3)</small>
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="bg-white rounded-3 p-3 border shadow-sm h-100">
+        <i class="bi bi-telephone fs-3 text-primary mb-2"></i>
+        <h5 class="mb-1">Телефон</h5>
+        <p class="text-muted mb-0">
+          <a href="tel:+74951234567" class="text-decoration-none">+7 (495) 123-45-67</a><br>
+          <small>ежедневно с 9:00 до 21:00</small>
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="bg-white rounded-3 p-3 border shadow-sm h-100">
+        <i class="bi bi-envelope fs-3 text-primary mb-2"></i>
+        <h5 class="mb-1">Email</h5>
+        <p class="text-muted mb-0">
+          <a href="mailto:info@megamart.ru" class="text-decoration-none">info@megamart.ru</a><br>
+          <small>отвечаем в течение 2 часов</small>
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="bg-white rounded-3 p-3 border shadow-sm h-100">
+        <i class="bi bi-clock fs-3 text-primary mb-2"></i>
+        <h5 class="mb-1">Режим работы</h5>
+        <p class="text-muted mb-0">
+          Пн–Пт: 9:00 – 20:00<br>
+          Сб–Вс: 10:00 – 18:00<br>
+          <small>без перерывов</small>
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

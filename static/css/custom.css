@@ -1,0 +1,521 @@
+/* ============================================================
+   MegaMart – Финальный дизайн (сине-белая гамма, Bootstrap 5 + mobile)
+   Версия: 3.0
+   ============================================================ */
+
+/* --- 1. Переменные (без оранжевого акцента) --- */
+:root {
+  --mm-primary: #0d6efd;
+  --mm-primary-dark: #0b5ed7;
+  --mm-secondary: #6c757d;
+  --mm-success: #198754;
+  --mm-warning: #ffc107;
+  --mm-danger: #dc3545;
+  --mm-light: #f8f9fa;
+  --mm-dark: #212529;
+  --mm-accent: #0d6efd;          /* стал синим вместо #fd7e14 */
+  --mm-accent-hover: #0b5ed7;    /* hover тоже синий */
+  --mm-bg: #f5f7fa;
+  --mm-card-bg: #ffffff;
+  --mm-footer-bg: #343a40;
+  --mm-header-bg: #ffffff;
+  --mm-radius: 0.5rem;
+  --mm-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+  --mm-shadow-hover: 0 0.5rem 1rem rgba(0,0,0,0.12);
+  --mm-transition: all 0.2s ease-in-out;
+}
+
+/* --- 2. Общие стили --- */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--mm-bg);
+  color: var(--mm-dark);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+a {
+  transition: var(--mm-transition);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* --- 3. Хлебные крошки --- */
+.breadcrumb {
+  background: transparent;
+  font-size: 0.85rem;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+}
+.breadcrumb-item a {
+  color: var(--mm-primary);
+  text-decoration: none;
+}
+.breadcrumb-item.active {
+  color: var(--mm-secondary);
+}
+
+/* --- 4. Кнопки (все синие) --- */
+.btn {
+  border-radius: var(--mm-radius);
+  font-weight: 500;
+  transition: var(--mm-transition);
+}
+
+.btn-primary {
+  background: var(--mm-primary);
+  border-color: var(--mm-primary);
+}
+.btn-primary:hover {
+  background: var(--mm-primary-dark);
+  border-color: var(--mm-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(13,110,253,0.3);
+}
+
+/* .btn-accent теперь тоже синий (на всякий случай) */
+.btn-accent {
+  background: var(--mm-primary);
+  border-color: var(--mm-primary);
+  color: #fff;
+}
+.btn-accent:hover {
+  background: var(--mm-primary-dark);
+  border-color: var(--mm-primary-dark);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(13,110,253,0.3);
+}
+
+.btn-outline-primary:hover {
+  background: var(--mm-primary);
+  border-color: var(--mm-primary);
+}
+
+/* --- 5. Шапка --- */
+.navbar-megamart {
+  background: var(--mm-header-bg);
+  box-shadow: var(--mm-shadow);
+  padding: 0.75rem 0;
+}
+.navbar-megamart .navbar-brand {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--mm-primary) !important;
+}
+.navbar-megamart .nav-link {
+  font-weight: 500;
+  color: var(--mm-dark);
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+}
+.navbar-megamart .nav-link:hover,
+.navbar-megamart .nav-link.active {
+  color: var(--mm-primary);
+  background: rgba(13,110,253,0.08);
+}
+
+/* --- 6. Карточки товаров (каталог) --- */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.product-card {
+  background: var(--mm-card-bg);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: var(--mm-radius);
+  overflow: hidden;
+  transition: var(--mm-transition);
+  box-shadow: var(--mm-shadow);
+  display: flex;
+  flex-direction: column;
+  position: relative;          /* для stretched-link */
+  animation: fadeInUp 0.4s ease-out both;
+}
+.product-card:nth-child(odd) { animation-delay: 0.1s; }
+.product-card:nth-child(even) { animation-delay: 0.2s; }
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--mm-shadow-hover);
+}
+.product-card .card-img-top {
+  height: 220px;
+  object-fit: contain;
+  padding: 1rem;
+  background: #f9f9f9;
+}
+.product-card .card-body {
+  padding: 1.25rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.product-card .card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.product-card .card-text {
+  color: var(--mm-secondary);
+  font-size: 0.85rem;
+  flex: 1;
+}
+/* Цена в карточке – синяя */
+.product-card .price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--mm-primary);
+  margin: 0.75rem 0;
+}
+.product-card .old-price {
+  font-size: 0.9rem;
+  color: var(--mm-secondary);
+  text-decoration: line-through;
+}
+.product-card .btn {
+  width: 100%;
+}
+
+/* stretched-link для клика по карточке */
+.product-card .stretched-link::after {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  z-index: 1;
+  content: "";
+}
+.product-card form,
+.product-card .btn,
+.product-card button {
+  position: relative;
+  z-index: 2;
+}
+.product-card .badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* --- 7. Фильтры (каталог) --- */
+.filter-sidebar {
+  background: #fff;
+  border-radius: var(--mm-radius);
+  box-shadow: var(--mm-shadow);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.filter-sidebar h5 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--mm-primary);
+}
+.filter-group {
+  margin-bottom: 1.5rem;
+}
+.filter-group label {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+.filter-group .form-check {
+  margin-bottom: 0.25rem;
+}
+
+/* --- 8. Пагинация --- */
+.pagination {
+  justify-content: center;
+  margin-top: 2rem;
+}
+.page-link {
+  color: var(--mm-primary);
+  border-radius: 0.25rem;
+  margin: 0 0.1rem;
+}
+.page-item.active .page-link {
+  background: var(--mm-primary);
+  border-color: var(--mm-primary);
+}
+
+/* --- 9. Детальная страница товара --- */
+.product-detail-image {
+  max-height: 450px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: var(--mm-radius);
+  padding: 1rem;
+  box-shadow: var(--mm-shadow);
+}
+/* Цена на детальной – синяя */
+.product-detail-price {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--mm-primary);
+}
+.product-detail-actions .btn {
+  min-width: 160px;
+}
+
+/* Рейтинг */
+.star-rating {
+  color: var(--mm-warning);
+  font-size: 1.2rem;
+}
+/* Отзывы */
+.review-item {
+  border-bottom: 1px solid #eee;
+  padding: 1rem 0;
+}
+.review-item:last-child {
+  border-bottom: none;
+}
+.review-form {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: var(--mm-radius);
+  box-shadow: var(--mm-shadow);
+}
+
+/* --- 10. Корзина --- */
+.cart-item {
+  border-bottom: 1px solid #eee;
+  padding: 1.5rem 0;
+}
+.cart-item:last-child {
+  border-bottom: none;
+}
+.cart-item-img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border-radius: 0.5rem;
+  background: #f8f9fa;
+  padding: 0.5rem;
+}
+.cart-item-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+/* Цена позиции в корзине – синяя */
+.cart-item-price {
+  color: var(--mm-primary);
+  font-weight: 700;
+}
+.quantity-input {
+  max-width: 80px;
+  text-align: center;
+}
+/* Итоги корзины */
+.cart-summary {
+  background: #fff;
+  border-radius: var(--mm-radius);
+  box-shadow: var(--mm-shadow);
+  padding: 1.5rem;
+  position: sticky;
+  top: 1rem;
+}
+.cart-summary .total {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* --- 11. Оформление заказа --- */
+.checkout-form {
+  background: #fff;
+  border-radius: var(--mm-radius);
+  box-shadow: var(--mm-shadow);
+  padding: 2rem;
+}
+.checkout-form .form-label {
+  font-weight: 500;
+}
+
+/* --- 12. Личный кабинет --- */
+.profile-sidebar {
+  background: #fff;
+  border-radius: var(--mm-radius);
+  box-shadow: var(--mm-shadow);
+  padding: 1.5rem;
+}
+.profile-sidebar .nav-link {
+  color: var(--mm-dark);
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+.profile-sidebar .nav-link.active,
+.profile-sidebar .nav-link:hover {
+  background: rgba(13,110,253,0.1);
+  color: var(--mm-primary);
+}
+.order-history .table {
+  background: #fff;
+  border-radius: var(--mm-radius);
+  overflow: hidden;
+  box-shadow: var(--mm-shadow);
+}
+
+/* --- 13. Аутентификация --- */
+.auth-container {
+  max-width: 450px;
+  margin: 2rem auto;
+  background: #fff;
+  padding: 2rem;
+  border-radius: var(--mm-radius);
+  box-shadow: var(--mm-shadow);
+}
+.auth-container h3 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.auth-container .btn {
+  width: 100%;
+}
+
+/* --- 14. Уведомления --- */
+.notification-list .list-group-item {
+  border-left: 4px solid transparent;
+  transition: var(--mm-transition);
+}
+.notification-list .list-group-item.unread {
+  background-color: rgba(13,110,253,0.05);
+  border-left-color: var(--mm-primary);
+  font-weight: 500;
+}
+
+/* --- 15. Акции и промо --- */
+.promo-banner {
+  background: linear-gradient(135deg, var(--mm-primary) 0%, #6610f2 100%);
+  color: #fff;
+  border-radius: var(--mm-radius);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+.promo-banner h2 {
+  font-weight: 700;
+}
+.promo-banner .btn {
+  background: #fff;
+  color: var(--mm-primary);
+  border: none;
+  font-weight: 600;
+}
+.promo-banner .btn:hover {
+  background: #f0f0f0;
+  color: var(--mm-primary-dark);
+}
+
+/* --- 16. Футер --- */
+.footer {
+  background: var(--mm-footer-bg);
+  color: #ccc;
+  padding: 2rem 0;
+  margin-top: auto;
+}
+.footer a {
+  color: #ccc;
+  text-decoration: none;
+}
+.footer a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+.footer h5 {
+  color: #fff;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+/* --- 17. Модальные окна, выпадающие списки --- */
+.modal-content {
+  border-radius: var(--mm-radius);
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.3);
+}
+.dropdown-menu {
+  border-radius: var(--mm-radius);
+  box-shadow: var(--mm-shadow-hover);
+}
+
+/* --- 18. Улучшенные формы --- */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--mm-primary);
+  box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.15);
+}
+
+/* --- 19. Адаптивность --- */
+@media (max-width: 992px) {
+  .filter-sidebar {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-megamart .navbar-brand {
+    font-size: 1.4rem;
+  }
+  .product-card .card-img-top {
+    height: 160px;
+  }
+  .product-detail-image {
+    max-height: 300px;
+  }
+  .product-detail-price {
+    font-size: 1.5rem;
+  }
+  .cart-item-img {
+    width: 80px;
+    height: 80px;
+  }
+  .cart-summary {
+    position: static;
+    margin-top: 1rem;
+  }
+  .cart-summary .total {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+  .btn {
+    font-size: 0.9rem;
+  }
+  .product-card .card-body {
+    padding: 1rem;
+  }
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+  .auth-container {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+}
+
+/* --- 20. Микроанимации --- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out;
+}

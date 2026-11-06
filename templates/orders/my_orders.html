@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Мои заказы - MegaMart{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+    <h2 class="mb-0 fw-bold"><i class="bi bi-box-seam me-2"></i>Мои заказы</h2>
+    <a href="{% url 'catalog:product_list_all' %}" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-plus-circle me-1"></i>Новый заказ
+    </a>
+  </div>
+
+  {% if orders %}
+    <div class="card border-0 shadow-sm rounded-3">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+            <tr>
+              <th class="ps-4">№ Заказа</th>
+              <th>Дата</th>
+              <th>Статус</th>
+              <th>Позиций</th>
+              <th>Сумма</th>
+              <th class="pe-4 text-end">Действия</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in orders %}
+              <tr>
+                <td class="ps-4 fw-medium">#{{ order.id }}</td>
+                <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                <td>
+                  {% if order.status == 'pending' %}
+                    <span class="badge bg-warning text-dark">Ожидает оплаты</span>
+                  {% elif order.status == 'processing' %}
+                    <span class="badge bg-info">Собирается</span>
+                  {% elif order.status == 'shipped' %}
+                    <span class="badge bg-primary">Отправлен</span>
+                  {% elif order.status == 'delivered' %}
+                    <span class="badge bg-success">Доставлен</span>
+                  {% elif order.status == 'cancelled' %}
+                    <span class="badge bg-secondary">Отменён</span>
+                  {% else %}
+                    <span class="badge bg-light text-dark">{{ order.get_status_display }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ order.items.count }}</td>
+                <td class="fw-bold">{{ order.total_price }} ₽</td>
+                <td class="pe-4 text-end">
+                  <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-eye me-1"></i>Подробнее
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div class="text-center py-5 bg-white rounded-3 border shadow-sm">
+      <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
+      <h4 class="mb-2">У вас пока нет заказов</h4>
+      <p class="text-secondary mb-4">Оформите первый заказ, и он появится здесь.</p>
+      <a href="{% url 'catalog:product_list_all' %}" class="btn btn-primary">
+        <i class="bi bi-bag me-2"></i>Перейти в каталог
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

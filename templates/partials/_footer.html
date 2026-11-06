@@ -1,0 +1,72 @@
+<footer class="footer">
+  <div class="container">
+    <div class="row g-4">
+      
+      <!-- Company Info -->
+      <div class="col-lg-4 col-md-6">
+        <h5><i class="bi bi-house-heart-fill me-2"></i>MegaMart</h5>
+        <p class="small text-white-50 mb-3">
+          Интернет-магазин сантехники премиум-класса. 
+          Официальный дилер ведущих европейских брендов.
+        </p>
+        <div class="d-flex gap-3">
+        </div>
+      </div>
+      
+      <!-- Catalog Links -->
+      <div class="col-lg-2 col-md-6">
+        <h5>Каталог</h5>
+        <ul class="list-unstyled small">
+          {% for category in footer_categories %}
+            <li><a href="{% url 'catalog:product_list' %}?category={{ category.slug }}" class="text-white-50">{{ category.name }}</a></li>
+          {% endfor %}
+          <li><a href="{% url 'catalog:product_list_all' %}" class="text-white-50">Все товары</a></li>
+        </ul>
+      </div>
+      
+      <!-- Info Links -->
+      <div class="col-lg-3 col-md-6">
+        <h5>Информация</h5>
+        <ul class="list-unstyled small">
+          <li><a href="{% url 'info_delivery' %}" class="text-white-50">Доставка и оплата</a></li>
+          <li><a href="{% url 'info_warranty' %}" class="text-white-50">Гарантия и возврат</a></li>
+          <li><a href="{% url 'info_promo' %}" class="text-white-50">Акции и скидки</a></li>
+          <li><a href="{% url 'info_blog' %}" class="text-white-50">Блог</a></li>
+          <li><a href="{% url 'info_contacts' %}" class="text-white-50">Контакты</a></li>
+        </ul>
+      </div>
+      
+      <!-- Contacts -->
+      <div class="col-lg-3 col-md-6">
+        <h5>Контакты</h5>
+        <ul class="list-unstyled small text-white-50">
+          <li class="mb-1">
+            <i class="bi bi-geo-alt me-2"></i>
+            г. Москва, ул. Примерная, 123
+          </li>
+          <li class="mb-1">
+            <i class="bi bi-telephone me-2"></i>
+            <a href="tel:+74951234567" class="text-white-50">+7 (495) 123-45-67</a>
+          </li>
+          <li class="mb-1">
+            <i class="bi bi-envelope me-2"></i>
+            <a href="mailto:info@megamart.ru" class="text-white-50">info@megamart.ru</a>
+          </li>
+          <li class="mb-1">
+            <i class="bi bi-clock me-2"></i>
+            Пн-Вс: 9:00 — 21:00
+          </li>
+        </ul>
+      </div>
+      
+    </div>
+    
+    <!-- Bottom -->
+    <div class="border-top border-secondary pt-3 mt-4 text-center small text-white-50">
+      <p class="mb-0">
+        © {% now "Y" %} MegaMart. Все права защищены. 
+        <a href="{% url 'info_privacy' %}" class="text-white-50">Политика конфиденциальности</a>
+      </p>
+    </div>
+  </div>
+</footer>

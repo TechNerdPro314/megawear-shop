@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <!-- Сайдбар с фильтрами -->
+    <div class="col-md-3 mb-4">
+        <div class="p-3" style="background: var(--panel); border: 1px solid var(--line);">
+            <h5 class="text-white mb-3">ФИЛЬТРЫ</h5>
+            <form method="get" id="filter-form">
+                <!-- Поиск -->
+                <input type="text" name="q" class="form-control mb-3" placeholder="Поиск..." value="{{ request.GET.q }}">
+                
+                <!-- Бренды -->
+                <h6 class="text-lime mt-4">Бренды</h6>
+                {% for brand in brands %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="brand" value="{{ brand.slug }}" id="brand-{{ brand.id }}" {% if brand.slug in selected_brands %}checked{% endif %}>
+                    <label class="form-check-label text-white" for="brand-{{ brand.id }}">{{ brand.name }}</label>
+                </div>
+                {% endfor %}
+
+                <!-- Атрибуты (из вашего View) -->
+                {% for attr_data in filter_attributes %}
+                <h6 class="text-lime mt-4">{{ attr_data.attribute.name }}</h6>
+                {% for val in attr_data.values %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="attr_{{ attr_data.attribute.slug }}" value="{{ val }}" id="attr-{{ attr_data.attribute.slug }}-{{ forloop.counter }}" {% if val in selected_attrs|default:'' %}checked{% endif %}>
+                    <label class="form-check-label text-white" for="attr-{{ attr_data.attribute.slug }}-{{ forloop.counter }}">{{ val }}</label>
+                </div>
+                {% endfor %}
+                {% endfor %}
+
+                <button type="submit" class="btn btn-lime w-100 mt-4">ПРИМЕНИТЬ</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Сетка товаров -->
+    <div class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-white m-0">КАТАЛОГ</h2>
+            <!-- Сортировка -->
+            <form method="get" class="d-flex align-items-center gap-2">
+                <span class="text-muted small">Сортировка:</span>
+                <select name="sort" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+                    <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Новинки</option>
+                    <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>Сначала дешевле</option>
+                    <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>Сначала дороже</option>
+                </select>
+                <!-- Скрытые поля для сохранения фильтров при сортировке -->
+                {% for k, v in request.GET.items %}
+                    {% if k != 'sort' and k != 'page' %}
+                        <input type="hidden" name="{{ k }}" value="{{ v }}">
+                    {% endif %}
+                {% endfor %}
+            </form>
+        </div>
+
+        <div class="row g-4">
+            {% for product in products %}
+            <div class="col-6 col-lg-4">
+                <div class="product-card">
+                    {% if product.main_image %}
+                        <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+                    {% else %}
+                        <div style="height: 200px; background: #222;"></div>
+                    {% endif %}
+                    <div class="card-body">
+                        <span class="text-muted small">{{ product.category.name }}</span>
+                        <h5 class="text-white mt-1 mb-3">
+                            <a href="{{ product.get_absolute_url }}" class="text-white text-decoration-none">{{ product.name }}</a>
+                        </h5>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <span class="price">{{ product.price }} ₽</span>
+                            <form action="{% url 'cart:add_to_cart' product.id %}" method="post" class="ajax-add-to-cart">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-lime">В КОРЗИНУ</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <h4 class="text-muted">По вашему запросу ничего не найдено</h4>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Пагинация (упрощенная) -->
+        {% if is_paginated %}
+        <nav class="mt-5">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link bg-dark text-lime border-dark" href="?page={{ page_obj.previous_page_number }}{{ filter_params }}">Назад</a></li>
+                {% endif %}
+                <li class="page-item disabled"><span class="page-link bg-dark text-white border-dark">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link bg-dark text-lime border-dark" href="?page={{ page_obj.next_page_number }}{{ filter_params }}">Вперед</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

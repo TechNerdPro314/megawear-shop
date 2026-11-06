@@ -1,0 +1,21 @@
+{% comment %}
+  Р’С‹Р·С‹РІР°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ РёР· base.html.
+  РћР¶РёРґР°РµС‚ РїРµСЂРµРјРµРЅРЅСѓСЋ items: СЃРїРёСЃРѕРє СЃР»РѕРІР°СЂРµР№ [{"name": "...", "url": "..."}, ...]
+{% endcomment %}
+{% if items %}
+<nav class="breadcrumb-megamart" aria-label="РќР°РІРёРіР°С†РёСЏ">
+  <div class="container">
+    <ol class="breadcrumb mb-0">
+      {% for item in items %}
+        {% if forloop.last %}
+          <li class="breadcrumb-item active" aria-current="page">{{ item.name }}</li>
+        {% elif item.url %}
+          <li class="breadcrumb-item"><a href="{{ item.url }}">{{ item.name }}</a></li>
+        {% else %}
+          <li class="breadcrumb-item">{{ item.name }}</li>
+        {% endif %}
+      {% endfor %}
+    </ol>
+  </div>
+</nav>
+{% endif %}

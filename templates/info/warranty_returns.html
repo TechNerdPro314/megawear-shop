@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Гарантия и возврат - MegaMart{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="h2 fw-bold mb-4"><i class="bi bi-shield-check me-2"></i>Гарантия и возврат</h1>
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-body p-4">
+          <h3 class="h5 fw-bold mb-3 text-success"><i class="bi bi-patch-check me-2"></i>Гарантийные обязательства</h3>
+          <p>На всю сантехническую продукцию действует официальная гарантия производителя от <strong>1 до 10 лет</strong>. Мы являемся официальным дилером брендов Grohe, Hansgrohe, Roca и др.</p>
+          <ul class="mb-0">
+            <li>Гарантия распространяется на заводские дефекты материалов и сборки.</li>
+            <li>Сервисное обслуживание осуществляется через авторизованные центры.</li>
+            <li>Чек и гарантийный талон высылаются на email после покупки.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-4">
+          <h3 class="h5 fw-bold mb-3 text-danger"><i class="bi bi-arrow-counterclockwise me-2"></i>Возврат и обмен</h3>
+          <p>Вы можете вернуть товар надлежащего качества в течение <strong>14 дней</strong> с момента получения, если сохранены товарный вид, упаковка и документы.</p>
+          <div class="alert alert-info d-flex align-items-start">
+            <i class="bi bi-info-circle-fill me-2 mt-1"></i>
+            <!-- ИСПРАВЛЕНО: user_orders -> my_orders -->
+            <div>Для оформления возврата создайте заявку в <a href="{% url 'orders:my_orders' %}">личном кабинете</a> или свяжитесь с поддержкой. Деньги вернутся на карту в течение 3-5 рабочих дней.</div>
+          </div>
+          <p class="small text-muted mb-0">* Сантехническая продукция, прошедшая монтаж или имеющая следы эксплуатации, возврату не подлежит согласно Постановлению Правительства РФ №2463.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-3 bg-primary text-white p-4 text-center h-100">
+        <i class="bi bi-headset fs-1 mb-3"></i>
+        <h4 class="h5 fw-bold">Нужна помощь?</h4>
+        <p class="small opacity-90 mb-4">Наши специалисты проконсультируют по гарантийным случаям и помогут оформить возврат.</p>
+        <a href="{% url 'info_contacts' %}" class="btn btn-light w-100 fw-bold">Связаться с нами</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

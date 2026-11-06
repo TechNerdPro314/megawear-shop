@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Написать отзыв на {{ product.name }} - MegaMart{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <!-- Header -->
+        <div class="card-header bg-primary text-white p-4">
+          <h3 class="card-title mb-1 fw-bold"><i class="bi bi-chat-left-text me-2"></i>Написать отзыв</h3>
+          <p class="mb-0 opacity-90">для товара: {{ product.name }}</p>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+          
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post" action="{% url 'reviews:add_review' product.id %}" novalidate>
+            {% csrf_token %}
+
+            <!-- Rating Field -->
+            <div class="mb-4">
+              <label class="form-label fw-bold d-block mb-2">Ваша оценка:</label>
+              <div class="rating-stars d-flex gap-2">
+                {% for i in "12345"|make_list %}
+                  <input type="radio" name="rating" value="{{ i }}" id="star{{ i }}" 
+                         class="btn-check" {% if i == '5' %}checked{% endif %}>
+                  <label class="btn btn-outline-warning" for="star{{ i }}">
+                    <i class="bi bi-star-fill"></i>
+                  </label>
+                {% endfor %}
+              </div>
+              {% if form.rating.errors %}
+                <div class="text-danger small mt-1">{{ form.rating.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Review Text Field -->
+            <div class="mb-4">
+              <label for="id_text" class="form-label fw-bold">Ваш отзыв:</label>
+              <textarea name="text" id="id_text" rows="5" 
+                        class="form-control {% if form.text.errors %}is-invalid{% endif %}" 
+                        placeholder="Расскажите о вашем опыте использования товара..."
+                        required></textarea>
+              {% if form.text.errors %}
+                <div class="invalid-feedback">{{ form.text.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="d-flex gap-2">
+              <a href="{{ product.get_absolute_url }}" class="btn btn-secondary flex-fill">Отмена</a>
+              <button type="submit" class="btn btn-primary flex-fill">
+                <i class="bi bi-send-fill me-2"></i>Отправить отзыв
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  .rating-stars input:checked + label {
+    background-color: #ffc107 !important;
+    color: #fff !important;
+    border-color: #ffc107 !important;
+  }
+  .rating-stars label:hover, .rating-stars label:hover ~ label {
+    background-color: #ffeeba !important;
+    border-color: #ffc107 !important;
+  }
+</style>
+{% endblock %}

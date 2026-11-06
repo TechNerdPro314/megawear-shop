@@ -1,0 +1,300 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#080909">
+    
+    <title>{% block title %}{{ seo_meta.title|default:"NFWEAR | Оптовая одежда" }}{% endblock %}</title>
+    <meta name="description" content="{{ seo_meta.description|default:'Оптовая продажа одежды. Широкий ассортимент, доставка по России.' }}">
+    <meta name="keywords" content="{{ seo_meta.keywords|default:'одежда оптом, купить одежду, магазин одежды' }}">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Новая тема -->
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    
+    <style>
+        .header-icon-btn {
+            color: var(--white);
+            font-size: 1.3rem;
+            transition: color 0.2s;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        .header-icon-btn:hover, .header-icon-btn:focus {
+            color: var(--lime);
+        }
+        .header-icon-badge {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            font-size: 0.6rem;
+            padding: 2px 5px;
+        }
+        .header-search {
+            background-color: var(--panel);
+            border: 1px solid var(--line);
+            color: var(--white);
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 14px;
+            max-width: 250px;
+        }
+        .header-search:focus {
+            outline: none;
+            border-color: var(--lime);
+        }
+        .dropdown-menu {
+            background-color: var(--panel);
+            border: 1px solid var(--line);
+            min-width: 280px;
+        }
+        .dropdown-item {
+            color: var(--white);
+            font-size: 14px;
+            white-space: normal;
+        }
+        .dropdown-item:hover {
+            background-color: #1a1c16;
+            color: var(--lime);
+        }
+        .dropdown-divider { border-color: var(--line); }
+        
+        .django-alert {
+            background-color: var(--panel);
+            border: 1px solid var(--lime);
+            color: var(--white);
+            border-left: 5px solid var(--lime);
+        }
+        .django-alert.alert-danger { border-color: #ff4444; border-left-color: #ff4444; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<div class="top-bar text-center">
+    ОПТОВАЯ ОДЕЖДА · ДОСТАВКА ПО РОССИИ · НАДЕЖНЫЙ ПОСТАВЩИК
+</div>
+
+<header class="site-header py-3 mb-4 sticky-top">
+    <div class="container d-flex align-items-center justify-content-between flex-wrap gap-3">
+        
+        <a href="{% url 'catalog:home' %}" class="text-decoration-none d-flex align-items-center">
+            <h2 class="m-0 text-white" style="font-family: 'Oswald'; font-size: 2.2rem; font-weight: 700; letter-spacing: -1px; transform: skewX(-10deg);">
+                MEGA<span class="text-lime">WEAR</span>
+            </h2>
+        </a>
+        
+        <nav class="d-none d-xl-flex gap-4">
+            <a href="{% url 'catalog:home' %}" class="nav-link">Главная</a>
+            <a href="{% url 'catalog:product_list' %}" class="nav-link">Каталог</a>
+            <a href="{% url 'info_delivery' %}" class="nav-link">Доставка</a>
+            <a href="{% url 'info_contacts' %}" class="nav-link">Контакты</a>
+        </nav>
+
+        <div class="d-flex align-items-center gap-3 gap-md-4">
+            
+            <form action="{% url 'catalog:product_list' %}" method="get" class="d-none d-md-block">
+                <input type="text" name="q" class="header-search" placeholder="Поиск товаров..." value="{{ request.GET.q }}">
+            </form>
+
+            <div class="d-flex align-items-center gap-3">
+                <!-- УВЕДОМЛЕНИЯ -->
+                <div class="dropdown" id="notificationsDropdown">
+                    <a href="#" class="header-icon-btn" id="notifBtn" title="Уведомления">
+                        <i class="bi bi-bell"></i>
+                        {% if user.is_authenticated %}
+                            <span class="badge bg-danger rounded-pill header-icon-badge">3</span>
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow" id="notifMenu">
+                        <li><h6 class="dropdown-header text-muted text-uppercase">Уведомления</h6></li>
+                        
+                        {% if user.is_authenticated %}
+                            <li><a class="dropdown-item" href="{% url 'users:profile' %}">Ваш заказ №123 отправлен</a></li>
+                            <li><a class="dropdown-item" href="{% url 'catalog:product_list' %}">Скидка 10% на следующий заказ</a></li>
+                            <li><a class="dropdown-item" href="{% url 'catalog:product_list' %}">Новые поступления</a></li>
+                        {% else %}
+                            <li><a class="dropdown-item" href="{% url 'users:login' %}?next={{ request.path }}">Войдите, чтобы видеть уведомления</a></li>
+                        {% endif %}
+                        
+                        <li><hr class="dropdown-divider"></li>
+                        {% if user.is_authenticated %}
+                            <li><a class="dropdown-item text-lime fw-bold" href="{% url 'users:profile' %}">Перейти в профиль</a></li>
+                        {% else %}
+                            <li><a class="dropdown-item text-lime fw-bold" href="{% url 'users:login' %}?next={{ request.path }}">Войти в аккаунт</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+                <a href="/comparison/" class="header-icon-btn d-none d-sm-flex" title="Сравнение цен">
+                    <i class="bi bi-bar-chart-steps"></i>
+                </a>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 border-start ps-3" style="border-color: var(--line) !important;">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'users:profile' %}" class="header-icon-btn" title="Личный кабинет">
+                        <i class="bi bi-person-circle"></i>
+                    </a>
+                    <a href="{% url 'users:logout' %}" class="text-muted small text-decoration-none d-none d-lg-block ms-1">Выйти</a>
+                {% else %}
+                    <a href="{% url 'users:login' %}" class="btn btn-outline-lime btn-sm py-1 px-2" style="font-size: 12px;">Войти</a>
+                    <a href="{% url 'users:register' %}" class="btn btn-lime btn-sm py-1 px-2 d-none d-lg-block" style="font-size: 12px;">Регистрация</a>
+                {% endif %}
+            </div>
+
+            <a href="{% url 'cart:cart_detail' %}" class="btn btn-outline-lime position-relative d-flex align-items-center gap-2 py-2 ms-1">
+                <i class="bi bi-cart3"></i>
+                <span class="d-none d-sm-block">Корзина</span>
+                <span id="cart-badge" class="badge rounded-pill {% if global_cart.get_total_quantity > 0 %}bg-danger text-white{% else %}bg-secondary text-dark{% endif %}" style="font-size: 0.75rem;">
+                    {{ global_cart.get_total_quantity|default:0 }}
+                </span>
+            </a>
+        </div>
+    </div>
+</header>
+
+{% if messages %}
+<div class="container mt-2">
+    {% for message in messages %}
+        <div class="alert django-alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main class="container flex-grow-1">
+    {% if breadcrumbs_items %}
+    <div class="breadcrumbs mb-4">
+        {% for crumb in breadcrumbs_items %}
+            {% if crumb.url %}
+                <a href="{{ crumb.url }}">{{ crumb.name }}</a> <span class="mx-1">/</span>
+            {% else %}
+                <span class="text-white">{{ crumb.name }}</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="border-top mt-5 py-4" style="border-color: var(--line) !important; background-color: var(--panel) !important;">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center text-muted">
+        <div class="d-flex align-items-center gap-3 mb-3 mb-md-0">
+            <h4 class="m-0 text-white" style="font-family: Oswald; transform: skewX(-10deg);">MEGA<span class="text-lime">WEAR</span></h4>
+            <span>© {% now "Y" %} Все права защищены.</span>
+        </div>
+        <div class="d-flex gap-4">
+            <a href="{% url 'info_contacts' %}" class="text-muted text-decoration-none">Контакты</a>
+            <a href="https://t.me/pohyist177" target="_blank" class="text-lime text-decoration-none">Telegram ↗</a>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Резервный скрипт для уведомлений (на случай если Bootstrap JS не сработает)
+    const notifBtn = document.getElementById('notifBtn');
+    const notifMenu = document.getElementById('notifMenu');
+    
+    if (notifBtn && notifMenu) {
+        notifBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!notifMenu.classList.contains('show')) {
+                notifMenu.classList.add('show');
+                notifMenu.style.display = 'block';
+                notifMenu.style.position = 'absolute';
+                notifMenu.style.transform = 'translate3d(-200px, 40px, 0px)';
+            } else {
+                notifMenu.classList.remove('show');
+                notifMenu.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!notifBtn.contains(e.target) && !notifMenu.contains(e.target)) {
+                notifMenu.classList.remove('show');
+                notifMenu.style.display = 'none';
+            }
+        });
+    }
+
+    // AJAX корзина
+    async function sendAjaxForm(form, url) {
+        const formData = new FormData(form);
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                const cartBadge = document.getElementById('cart-badge');
+                if (cartBadge && data.total_quantity !== undefined) {
+                    cartBadge.textContent = data.total_quantity;
+                    cartBadge.className = `badge rounded-pill ${data.total_quantity > 0 ? 'bg-danger text-white' : 'bg-secondary text-dark'}`;
+                }
+                if (window.location.pathname.includes('/cart/')) {
+                    window.location.reload(); 
+                } else {
+                    showToast(data.message || 'Товар добавлен в корзину!');
+                }
+            } else {
+                showToast(data.message || 'Произошла ошибка', 'danger');
+            }
+        } catch (error) {
+            showToast('Ошибка соединения.', 'danger');
+        }
+    }
+
+    function showToast(message, type = 'success') {
+        let container = document.getElementById('toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            container.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 9999;';
+            document.body.appendChild(container);
+        }
+        const toast = document.createElement('div');
+        toast.style.cssText = `background: ${type === 'success' ? 'var(--lime)' : '#ff4444'}; color: #080909; padding: 12px 24px; border-radius: 4px; font-weight: bold; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); transition: opacity 0.3s; text-transform: uppercase; font-family: 'Roboto Condensed';`;
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+    }
+
+    document.querySelectorAll('.ajax-add-to-cart').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '...';
+            submitBtn.disabled = true;
+            sendAjaxForm(this, this.action).finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    });
+});
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

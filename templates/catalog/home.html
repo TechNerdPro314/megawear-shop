@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- 1. HERO-СЕКЦИЯ (Как на макете) -->
+<section class="hero mb-5 position-relative overflow-hidden" style="background: radial-gradient(ellipse at 80% 50%, #1a1c16 0%, #080909 70%); border: 1px solid var(--line); border-radius: 8px;">
+    <div class="row align-items-center g-0">
+        <div class="col-md-6 p-4 p-md-5">
+            <p class="text-lime fw-bold mb-2" style="letter-spacing: 2px; font-size: 12px;">ОПТОВАЯ ПРОДАЖА ОДЕЖДЫ</p>
+            
+            <!-- Большой заголовок -->
+            <h1 class="display-1 text-white fw-bold mb-3" style="font-family: 'Oswald'; line-height: 0.9; letter-spacing: -2px;">
+                MEGA<br><span class="text-lime">WEAR</span>
+            </h1>
+            
+            <!-- Слоган с наклоном -->
+            <div class="mb-4" style="transform: rotate(-3deg); display: inline-block; background: var(--bg); padding: 5px 15px; border-left: 3px solid var(--lime);">
+                <h3 class="m-0 text-white" style="font-family: 'Oswald'; font-size: 1.8rem;">СТИЛЬ, КОТОРЫЙ <br>ПРОДАЁТСЯ ↗</h3>
+            </div>
+            
+            <p class="text-muted mb-4 fs-5" style="max-width: 400px;">Актуальные модели от топовых брендов. Большие партии, быстрая доставка по РФ.</p>
+            
+            <a href="/products/" class="btn btn-lime px-5 py-3 fs-5">ПЕРЕЙТИ В КАТАЛОГ →</a>
+        </div>
+        
+        <!-- Картинка в стиле Streetwear (Черно-белая с лаймовым акцентом) -->
+        <div class="col-md-6 d-none d-md-block position-relative" style="min-height: 500px;">
+            <div class="position-absolute w-100 h-100" style="background: url('https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=1000&q=80') center/cover; filter: grayscale(1) contrast(1.2); mask-image: linear-gradient(to right, transparent, black 20%);"></div>
+            <!-- Лаймовый стикер -->
+            <div class="position-absolute top-0 end-0 m-4 text-lime" style="font-family: 'Oswald'; font-size: 2rem; transform: rotate(10deg); text-shadow: 2px 2px 0 #000;">
+                БОЛЬШИЕ<br>ПАРТИИ
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2. КАТЕГОРИИ (Косые карточки с фото) -->
+<section class="mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <h2 class="m-0 text-white">ПОПУЛЯРНЫЕ <span class="text-lime">КАТЕГОРИИ</span> →</h2>
+        <a href="/products/" class="text-lime text-decoration-none fw-bold d-none d-md-block">ВЕСЬ КАТАЛОГ ↗</a>
+    </div>
+    
+    <div class="row g-3">
+        {% for category in categories|slice:":4" %}
+        <div class="col-6 col-md-3">
+            <a href="{{ category.get_absolute_url }}" class="text-decoration-none d-block position-relative overflow-hidden" style="height: 220px; border: 1px solid var(--line); background: #111;">
+                <!-- Используем картинку категории из базы, либо заглушку -->
+                {% if category.image %}
+                    <div class="position-absolute w-100 h-100" style="background: url('{{ category.image.url }}') center/cover; filter: grayscale(1); transition: 0.3s;" onmouseover="this.style.filter='grayscale(0)'" onmouseout="this.style.filter='grayscale(1)'"></div>
+                {% else %}
+                    <!-- Заглушка, если нет фото -->
+                    <div class="position-absolute w-100 h-100" style="background: url('https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=500&q=80') center/cover; filter: grayscale(1); transition: 0.3s;" onmouseover="this.style.filter='grayscale(0)'" onmouseout="this.style.filter='grayscale(1)'"></div>
+                {% endif %}
+                
+                <!-- Затемнение снизу -->
+                <div class="position-absolute w-100 h-100" style="background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%);"></div>
+                
+                <!-- Текст на карточке (наклоненный) -->
+                <span class="position-absolute bottom-0 start-0 p-3 text-white" style="font-family: 'Oswald'; font-size: 1.5rem; line-height: 1; transform: rotate(-3deg); text-shadow: 2px 2px 0 #000;">
+                    {{ category.name }} <b class="text-lime">↗</b>
+                </span>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- 3. БЛОК ПРЕИМУЩЕСТВ (Как на темном фоне) -->
+<section class="mb-5 py-4" style="background: var(--panel); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+    <div class="row align-items-center g-0">
+        <div class="col-md-4 p-4 p-md-5" style="border-right: 1px solid var(--line);">
+            <h2 class="text-white m-0" style="font-size: 2.5rem; line-height: 1.1;">ПОЧЕМУ <br>ВЫБИРАЮТ <br><span class="text-lime">НАС?</span> ↗</h2>
+        </div>
+        <div class="col-md-8 p-4">
+            <div class="row g-4 text-center text-md-start">
+                <div class="col-6 col-md-3">
+                    <div class="fs-1 text-lime mb-2">◇</div>
+                    <h5 class="text-white mb-2" style="font-size: 0.9rem;">ШИРОКИЙ АССОРТИМЕНТ</h5>
+                    <p class="text-muted small m-0">Актуальные модели от топовых брендов</p>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="fs-1 text-lime mb-2">⬡</div>
+                    <h5 class="text-white mb-2" style="font-size: 0.9rem;">НАДЕЖНЫЙ ПОСТАВЩИК</h5>
+                    <p class="text-muted small m-0">Работаем напрямую с производителями</p>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="fs-1 text-lime mb-2">♧</div>
+                    <h5 class="text-white mb-2" style="font-size: 0.9rem;">ТОПОВЫЕ БРЕНДЫ</h5>
+                    <p class="text-muted small m-0">Только проверенные бренды и качество</p>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="fs-1 text-lime mb-2">▣</div>
+                    <h5 class="text-white mb-2" style="font-size: 0.9rem;">БЫСТРАЯ ДОСТАВКА</h5>
+                    <p class="text-muted small m-0">Отправка по всей России</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. ПОПУЛЯРНЫЕ ТОВАРЫ (Сетка карточек) -->
+<section class="mb-5">
+    <h2 class="mb-4 text-white">ХИТЫ <span class="text-lime">ПРОДАЖ</span></h2>
+    <div class="row g-3">
+        {% for product in featured_products %}
+        <div class="col-6 col-md-3">
+            <div class="product-card">
+                {% if product.main_image %}
+                    <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+                {% else %}
+                    <div style="height: 200px; background: #222; border-bottom: 1px solid var(--line);"></div>
+                {% endif %}
+                <div class="card-body">
+                    <span class="text-muted small text-uppercase">{{ product.brand.name|default:"MEGA WEAR" }}</span>
+                    <h5 class="text-white mt-1 mb-3"><a href="{{ product.get_absolute_url }}" class="text-white text-decoration-none">{{ product.name }}</a></h5>
+                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                        <span class="price">{{ product.price }} ₽</span>
+                        <form action="{% url 'cart:add_to_cart' product.id %}" method="post" class="ajax-add-to-cart">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-lime py-1 px-2" style="font-size: 12px;">КУПИТЬ</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- 5. CTA ПАНЕЛЬ (Остались вопросы) -->
+<section class="mb-5 p-4 p-md-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4" style="background: linear-gradient(100deg, #171914, #0c0d0d); border: 1px solid var(--lime); border-radius: 4px;">
+    <div>
+        <h2 class="text-white m-0" style="font-size: 1.8rem;">ОСТАЛИСЬ ВОПРОСЫ?</h2>
+        <p class="text-muted m-0 mt-2">Напишите нам в Telegram — мы на связи!</p>
+    </div>
+    <a href="https://t.me/your_tg" target="_blank" class="btn btn-lime px-4 py-3">НАПИСАТЬ В TELEGRAM ↗</a>
+</section>
+
+{% endblock %}

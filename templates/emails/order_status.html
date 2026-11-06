@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Статус заказа #{{ order.id }} изменён — MegaMart</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; padding: 20px;">
+    <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+        
+        <!-- Header -->
+        <div style="background: #198754; color: white; padding: 25px 30px; text-align: center;">
+            <h1 style="margin: 0; font-size: 22px;">📦 Обновление статуса заказа</h1>
+        </div>
+        
+        <!-- Body -->
+        <div style="padding: 30px;">
+            <p>Уважаемый(ая) <strong>{{ order.customer_name }}</strong>!</p>
+            
+            <p>Статус вашего заказа <strong>#{{ order.id }}</strong> изменился:</p>
+            
+            <div style="background: #f0f9ff; border-left: 4px solid #0d6efd; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <p style="font-size: 18px; font-weight: bold; margin: 0;">
+                    {{ old_status }} → <span style="color: #0d6efd;">{{ order.get_status_display }}</span>
+                </p>
+            </div>
+            
+            <!-- Order Summary -->
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="margin-top: 0; font-size: 16px;">Детали заказа</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 6px 0;"><strong>Сумма:</strong></td>
+                        <td style="padding: 6px 0;">{{ order.total_amount }} ₽</td>
+                    </tr>
+                    {% if order.delivery_method %}
+                    <tr>
+                        <td style="padding: 6px 0;"><strong>Способ доставки:</strong></td>
+                        <td style="padding: 6px 0;">{{ order.get_delivery_method_display }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td style="padding: 6px 0;"><strong>Статус:</strong></td>
+                        <td style="padding: 6px 0;">{{ order.get_status_display }}</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Сообщение в зависимости от статуса -->
+            {% if order.status == 'paid' %}
+            <p>✅ Заказ успешно оплачен. Мы начинаем его сборку.</p>
+            {% elif order.status == 'processing' %}
+            <p>🔧 Заказ находится в обработке. Скоро он будет передан в доставку.</p>
+            {% elif order.status == 'shipped' %}
+            <p>🚚 Заказ передан в службу доставки. Ожидайте в ближайшее время.</p>
+            {% elif order.status == 'delivered' %}
+            <p>🏠 Заказ доставлен. Надеемся, вам всё понравилось!</p>
+            {% elif order.status == 'cancelled' %}
+            <p>❌ Заказ отменён. Если это ошибка, свяжитесь с нами.</p>
+            {% else %}
+            <p>Статус вашего заказа обновлён. Следите за изменениями в личном кабинете.</p>
+            {% endif %}
+            
+            <!-- Action Button -->
+            <div style="text-align: center; margin: 25px 0 10px;">
+                <a href="{{ site_url }}{% url 'orders:order_detail' order.id %}" 
+                   style="background: #0d6efd; color: white; padding: 12px 25px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+                    Смотреть заказ
+                </a>
+            </div>
+            
+            <p style="color: #666; font-size: 14px; margin-top: 20px;">
+                Если у вас возникли вопросы, свяжитесь с нами: {{ settings.DEFAULT_FROM_EMAIL }}
+            </p>
+        </div>
+        
+        <!-- Footer -->
+        <div style="background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #999;">
+            © MegaMart. Спасибо, что выбрали нас!
+        </div>
+    </div>
+</body>
+</html>

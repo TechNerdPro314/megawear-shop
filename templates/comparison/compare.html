@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load breadcrumbs %}
+
+{% block title %}{{ page_title|default:'Сравнение товаров' }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .compare-products-header {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+  }
+  .compare-product-card {
+    min-width: 220px;
+    max-width: 260px;
+    flex: 0 0 auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 1rem;
+    padding: 1rem;
+    text-align: center;
+    background: #fff;
+    position: relative;
+  }
+  .compare-product-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+  }
+  .compare-product-card .product-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .compare-product-card .product-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2563eb;
+    margin-bottom: 0.75rem;
+  }
+  .compare-product-card .btn-remove-compare {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255,255,255,0.8);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .compare-product-card .btn-remove-compare:hover {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+  .compare-table-wrapper {
+    overflow-x: auto;
+    margin-top: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+  }
+  .compare-table th,
+  .compare-table td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .compare-table th {
+    background: #f9fafb;
+    font-weight: 600;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  .compare-table td:first-child {
+    font-weight: 500;
+    background: #f9fafb;
+    color: #374151;
+    width: 180px;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+  }
+  .compare-table td.diff {
+    background: #fef3c7;
+    font-weight: 500;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    background: #fff;
+    border-radius: 1rem;
+    margin-top: 2rem;
+  }
+  .empty-state i {
+    font-size: 4rem;
+    color: #9ca3af;
+    margin-bottom: 1rem;
+  }
+  .btn-group-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="h3 mb-3">Сравнение товаров</h1>
+  {% render_breadcrumbs %}
+
+  {% if products_data %}
+    <!-- Карточки товаров -->
+    <div class="compare-products-header">
+      {% for item in products_data %}
+        {% with product=item.product %}
+        <div class="compare-product-card">
+          <button class="btn-remove-compare" title="Удалить из сравнения"
+                  onclick="removeFromComparison('{{ product.id }}')">
+            <i class="bi bi-x-lg"></i>
+          </button>
+          {% if product.main_image %}
+            <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+          {% else %}
+            <div class="bg-light d-flex align-items-center justify-content-center" style="height:160px;">
+              <i class="bi bi-image text-muted" style="font-size:3rem;"></i>
+            </div>
+          {% endif %}
+          <div class="product-name">{{ product.name }}</div>
+          <div class="product-price">{{ product.price|floatformat:0 }} ₽</div>
+          <form method="post" action="{% url 'cart:add_to_cart' product.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="quantity" value="1">
+            <button type="submit" class="btn btn-primary btn-sm w-100" {% if product.stock == 0 %}disabled{% endif %}>
+              <i class="bi bi-cart-plus"></i> В корзину
+            </button>
+          </form>
+        </div>
+        {% endwith %}
+      {% endfor %}
+    </div>
+
+    <!-- Таблица характеристик -->
+    <div class="compare-table-wrapper">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Характеристика</th>
+            {% for item in products_data %}
+              <th class="text-nowrap">{{ item.product.name|truncatechars:25 }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in comparison_rows %}
+            <tr>
+              <td>{{ row.name }}</td>
+              {% for value in row.values %}
+                <td class="{% if value != row.values.0 %}diff{% endif %}">
+                  {{ value }}
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Кнопки действий -->
+    <div class="btn-group-actions">
+      <form method="post" action="{% url 'comparison:remove_all' %}" id="clearForm">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger">
+          <i class="bi bi-trash"></i> Очистить сравнение
+        </button>
+      </form>
+      <a href="{% url 'catalog:product_list_all' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Добавить товары
+      </a>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <i class="bi bi-bar-chart-steps"></i>
+      <h2 class="h4">Нет товаров для сравнения</h2>
+      <p class="text-muted">Добавляйте товары со страниц каталога или карточки товара</p>
+      <a href="{% url 'catalog:product_list_all' %}" class="btn btn-primary mt-3">
+        Перейти в каталог
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function removeFromComparison(productId) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    fetch(`/comparison/remove/${productId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrfToken,
+      },
+    }).then(response => {
+      if (response.ok) {
+        location.reload();
+      }
+    });
+  }
+</script>
+{% endblock %}

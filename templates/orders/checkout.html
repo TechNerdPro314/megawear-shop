@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container py-4 py-md-5">
+  <h2 class="mb-4 fw-bold">Оформление заказа</h2>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="row g-4">
+    <!-- Левая колонка: товары + доставка -->
+    <div class="col-lg-7">
+      <!-- Шаг 1: Ваш заказ -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex align-items-center">
+          <span class="badge bg-primary rounded-pill me-3 fs-6">1</span>
+          <h5 class="mb-0 fw-semibold">Ваш заказ</h5>
+        </div>
+        <div class="card-body">
+          <table class="table table-borderless align-middle mb-0">
+            {% for item in cart %}
+            <tr>
+              <td class="ps-0">
+                <span class="fw-medium">{{ item.product.name }}</span>
+                <span class="text-muted"> ({{ item.quantity }} шт.)</span>
+              </td>
+              <td class="text-end pe-0 fw-medium">{{ item.total_price|floatformat:2 }} ₽</td>
+            </tr>
+            {% endfor %}
+          </table>
+          <hr class="my-3">
+          <dl class="row mb-1">
+            <dt class="col-sm-6 text-muted fw-normal">Подытог</dt>
+            <dd class="col-sm-6 text-end fw-medium" id="subtotal">{{ cart.get_subtotal_price|floatformat:2 }} ₽</dd>
+            <dt class="col-sm-6 text-muted fw-normal">Стоимость доставки</dt>
+            <dd class="col-sm-6 text-end fw-medium" id="delivery-cost">{{ cart.get_delivery_cost|floatformat:2 }} ₽</dd>
+            {% if cart.get_coupon %}
+            <dt class="col-sm-6 text-muted fw-normal">Скидка по купону</dt>
+            <dd class="col-sm-6 text-end fw-medium text-success" id="discount">{{ cart.get_discount_amount|floatformat:2 }} ₽</dd>
+            {% endif %}
+          </dl>
+          <hr class="my-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fs-5 fw-bold">Итого</span>
+            <span class="fs-4 fw-bold text-primary" id="total">{{ cart.get_final_price|floatformat:2 }} ₽</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Шаг 2: Способ доставки -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex align-items-center">
+          <span class="badge bg-primary rounded-pill me-3 fs-6">2</span>
+          <h5 class="mb-0 fw-semibold">Способ доставки</h5>
+        </div>
+        <div class="card-body">
+          <div id="delivery-options">
+            {% for key, option in delivery_options.items %}
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="delivery_method_radio"
+                     value="{{ key }}" id="delivery-{{ key }}"
+                     {% if current_delivery == key %}checked{% endif %}>
+              <label class="form-check-label d-flex justify-content-between align-items-center" for="delivery-{{ key }}">
+                <span>{{ option.name }} <small class="text-muted">({{ option.estimated_days }})</small></span>
+                <span class="badge bg-light text-dark">{{ option.base_cost }} ₽</span>
+              </label>
+              {% if option.free_threshold > 0 %}
+              <div class="ms-4 small text-muted">Бесплатно при заказе от {{ option.free_threshold }} ₽</div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          <div id="delivery-error" class="text-danger mt-3" style="display:none;">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> Пожалуйста, выберите способ доставки.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Правая колонка: контактные данные + способ оплаты + кнопка -->
+    <div class="col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex align-items-center">
+          <span class="badge bg-primary rounded-pill me-3 fs-6">3</span>
+          <h5 class="mb-0 fw-semibold">Контактные данные и оплата</h5>
+        </div>
+        <div class="card-body">
+          <form method="post" id="checkout-form">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="d-grid mt-3">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-check-circle me-2"></i> Подтвердить заказ
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+  #id_delivery_address,
+  #id_comment {
+    height: 80px !important;
+    resize: vertical;
+  }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deliveryRadios = document.querySelectorAll('input[name="delivery_method_radio"]');
+    const hiddenInput = document.getElementById('id_delivery_method');
+    const subtotalEl = document.getElementById('subtotal');
+    const deliveryCostEl = document.getElementById('delivery-cost');
+    const discountEl = document.getElementById('discount');
+    const totalEl = document.getElementById('total');
+    const deliveryError = document.getElementById('delivery-error');
+
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    async function updateDelivery(method) {
+        if (!method) return;
+        try {
+            const response = await fetch('{% url "cart:set_delivery" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ delivery_method: method })
+            });
+            if (!response.ok) throw new Error('HTTP error ' + response.status);
+            const data = await response.json();
+            if (data.success) {
+                subtotalEl.textContent = parseFloat(data.subtotal).toFixed(2);
+                deliveryCostEl.textContent = parseFloat(data.delivery_cost).toFixed(2);
+                totalEl.textContent = parseFloat(data.total).toFixed(2);
+                if (discountEl && data.discount !== undefined) {
+                    discountEl.textContent = parseFloat(data.discount).toFixed(2);
+                }
+                hiddenInput.value = method;
+                deliveryError.style.display = 'none';
+            } else {
+                deliveryError.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Ошибка обновления доставки:', error);
+            deliveryError.style.display = 'block';
+        }
+    }
+
+    deliveryRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            updateDelivery(this.value);
+        });
+    });
+
+    if (hiddenInput.value) {
+        updateDelivery(hiddenInput.value);
+    }
+
+    document.getElementById('checkout-form').addEventListener('submit', function(e) {
+        if (!hiddenInput.value) {
+            e.preventDefault();
+            deliveryError.style.display = 'block';
+            deliveryError.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+});
+</script>
+{% endblock %}

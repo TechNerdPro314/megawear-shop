@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Акции и скидки - MegaMart{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="h2 fw-bold mb-2 text-center">
+    <i class="bi bi-percent me-2"></i>Акции и скидки
+  </h1>
+  <p class="text-center text-muted mb-5">Выгодные предложения и промокоды для вашей экономии</p>
+
+  <!-- Список промокодов -->
+  <div class="row g-4">
+    {% for coupon in coupons %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-0 shadow-sm rounded-3 overflow-hidden h-100">
+        <!-- Заголовок акции -->
+        <div class="bg-primary text-white text-center py-2 fw-bold">
+          {% if coupon.discount_type == 'percent' %}
+            Скидка {{ coupon.discount_value }}%
+          {% else %}
+            Скидка {{ coupon.discount_value }} ₽
+          {% endif %}
+        </div>
+        <div class="card-body p-4 d-flex flex-column">
+          <h3 class="h5 fw-bold mb-2">{{ coupon.code }}</h3>
+          <p class="text-muted small flex-grow-1">
+            {% if coupon.description %}
+              {{ coupon.description }}
+            {% else %}
+              {% if coupon.min_order_amount > 0 %}
+                Минимальная сумма заказа: {{ coupon.min_order_amount }} ₽
+              {% else %}
+                На все товары без ограничений
+              {% endif %}
+            {% endif %}
+          </p>
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <small class="text-muted">
+              Действует до {{ coupon.valid_to|date:"d.m.Y" }}
+            </small>
+            <button class="btn btn-outline-primary btn-sm copy-code-btn"
+                    data-code="{{ coupon.code }}">
+              <i class="bi bi-clipboard me-1"></i> Скопировать
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="alert alert-info text-center">
+        <i class="bi bi-emoji-smile me-2"></i>На данный момент активных акций нет. Подпишитесь на рассылку, чтобы узнавать о новых скидках!
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Функционал копирования промокода в буфер обмена
+    document.querySelectorAll('.copy-code-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const code = this.getAttribute('data-code');
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="bi bi-check-lg me-1"></i> Скопировано!';
+                this.classList.add('btn-success');
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.classList.remove('btn-success');
+                }, 2000);
+            }).catch(() => {
+                alert('Не удалось скопировать. Промокод: ' + code);
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
