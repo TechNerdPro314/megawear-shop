@@ -15,9 +15,9 @@ class OrderStatus(models.TextChoices):
 
 class Order(models.Model):
     PAYMENT_METHODS = [
-        ("card", "Банковская карта"),
+        ("card", "Банковская картой при получении"),
         ("cash", "Наличные при доставке"),
-        ("online", "Онлайн оплата"),
+        #("online", "Онлайн оплата"),
     ]
 
     user = models.ForeignKey(

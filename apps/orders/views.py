@@ -30,12 +30,8 @@ def checkout_view(request):
                 # Отправляем уведомления (email и т.п.)
                 send_order_notifications.delay(order.id)
 
-                # Если оплата онлайн – перенаправляем на страницу оплаты
-                if order.payment_method == 'online':
-                    return redirect("payments:pay_order", order_id=order.id)
-                else:
-                    # Для наличных/в магазине сразу показываем успех
-                    return redirect("orders:order_success", order_id=order.id)
+                send_order_notifications.delay(order.id)
+                return redirect("orders:order_success", order_id=order.id)
 
             except OrderCreationError as e:
                 messages.error(request, f"Ошибка: {e}")

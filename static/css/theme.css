@@ -175,3 +175,93 @@ a:hover {
 .breadcrumbs a:hover { 
     text-decoration: underline !important; 
 }
+
+/* =========================================
+   ГЛОБАЛЬНЫЕ ИСПРАВЛЕНИЯ ДЛЯ ТЕМНОЙ ТЕМЫ
+   (Добавлено для профиля и форм)
+   ========================================= */
+
+/* Принудительный белый текст для контента, если не задан другой класс */
+main p, 
+main span, 
+main div, 
+main li,
+main td,
+main th,
+main label {
+    color: var(--white);
+}
+
+/* --- ИСПРАВЛЕНИЕ ФОРМ (Django / Crispy Forms) --- */
+
+/* Лейблы (подписи к полям) */
+label {
+    color: var(--white) !important;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+/* Placeholder (текст внутри инпута) */
+input::placeholder, 
+textarea::placeholder {
+    color: #666 !important;
+    opacity: 1;
+}
+
+/* Убираем белый/желтый фон автозаполнения (Chrome) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--panel) inset !important;
+    -webkit-text-fill-color: var(--white) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Текст ошибок валидации формы */
+.invalid-feedback, 
+.errorlist {
+    color: #ff4444 !important;
+    padding-left: 0;
+    list-style: none;
+    font-size: 0.875em;
+    margin-top: 4px;
+}
+.errorlist li {
+    color: #ff4444 !important;
+}
+
+/* Чекбоксы и радио-кнопки (чтобы были видны на темном фоне) */
+.form-check-input {
+    background-color: var(--panel);
+    border-color: var(--muted);
+}
+.form-check-input:checked {
+    background-color: var(--lime);
+    border-color: var(--lime);
+}
+.form-check-label {
+    color: var(--white) !important;
+}
+
+/* --- ИСПРАВЛЕНИЕ ТАБЛИЦ (История заказов, корзина) --- */
+.table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--white);
+    --bs-table-border-color: var(--line);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
+    --bs-table-hover-color: var(--lime);
+    color: var(--white) !important;
+}
+
+.table th {
+    color: var(--lime) !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-bottom-width: 2px !important;
+}
+
+.table td {
+    color: var(--white) !important;
+    vertical-align: middle;
+}

@@ -1,106 +1,357 @@
 {% extends 'base.html' %}
 
+{% block extra_head %}
+{{ block.super }}
+<style>
+  /* ===== МОБИЛКА (< 992px) ===== */
+  @media (max-width: 991.98px) {
+    /* Тулбар: сортировка + кнопка фильтров */
+    .catalog-toolbar {
+      display: flex;
+      align-items: stretch;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .catalog-toolbar__sort {
+      flex: 1;
+      min-width: 0;
+    }
+    .catalog-toolbar__sort .form-select {
+      width: 100%;
+      min-height: 44px;
+      font-size: 15px;
+      background-color: var(--panel);
+      color: var(--white);
+      border: 1px solid var(--line);
+      padding: 8px 32px 8px 12px;
+    }
+    .catalog-toolbar__filter-btn {
+      flex-shrink: 0;
+      min-height: 44px;
+      padding: 0 14px;
+      font-size: 14px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+    .catalog-toolbar__filter-btn .badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      background: var(--lime);
+      color: #080909;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    /* Offcanvas с фильтрами */
+    .offcanvas.mobile-filters {
+      background: var(--panel);
+      color: var(--white);
+      width: min(340px, 90vw);
+    }
+    .offcanvas.mobile-filters .offcanvas-header {
+      border-bottom: 1px solid var(--line);
+    }
+    .offcanvas.mobile-filters .offcanvas-title {
+      font-family: 'Oswald';
+      color: var(--white);
+    }
+    .offcanvas.mobile-filters .form-check {
+      padding: 10px 0 10px 28px;
+      margin-bottom: 2px;
+    }
+    .offcanvas.mobile-filters .form-check-input {
+      width: 1.2em;
+      height: 1.2em;
+      margin-left: -28px;
+      margin-top: 0.2em;
+    }
+    .offcanvas.mobile-filters .form-check-label {
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    /* Карточки товаров */
+    .product-card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-card img {
+      aspect-ratio: 1 / 1;
+      width: 100%;
+      height: auto !important;
+      object-fit: cover;
+    }
+    .product-card > div[style*="height: 200px"] {
+      aspect-ratio: 1 / 1;
+      height: auto !important;
+    }
+    .product-card .card-body {
+      padding: 10px !important;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-card .card-body > .text-muted {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .product-card h5 {
+      font-size: 0.9rem;
+      line-height: 1.3;
+      margin-bottom: 8px !important;
+      min-height: calc(0.9rem * 1.3 * 2);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .product-card .price {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    .product-card .btn-add-to-cart {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0 !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    .product-card .btn-add-to-cart .btn-label-text {
+      display: none;
+    }
+
+    /* Пагинация */
+    .catalog-pagination .page-link {
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+    }
+
+    /* Пустой результат */
+    .catalog-empty {
+      padding: 48px 16px;
+      text-align: center;
+    }
+    .catalog-empty__icon {
+      font-size: 3rem;
+      color: var(--line);
+      display: block;
+      margin-bottom: 16px;
+    }
+    .catalog-empty h4 {
+      font-size: 1.05rem;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row">
-    <!-- Сайдбар с фильтрами -->
-    <div class="col-md-3 mb-4">
-        <div class="p-3" style="background: var(--panel); border: 1px solid var(--line);">
-            <h5 class="text-white mb-3">ФИЛЬТРЫ</h5>
-            <form method="get" id="filter-form">
-                <!-- Поиск -->
-                <input type="text" name="q" class="form-control mb-3" placeholder="Поиск..." value="{{ request.GET.q }}">
-                
-                <!-- Бренды -->
-                <h6 class="text-lime mt-4">Бренды</h6>
-                {% for brand in brands %}
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="brand" value="{{ brand.slug }}" id="brand-{{ brand.id }}" {% if brand.slug in selected_brands %}checked{% endif %}>
-                    <label class="form-check-label text-white" for="brand-{{ brand.id }}">{{ brand.name }}</label>
-                </div>
-                {% endfor %}
+  <!-- Desktop sidebar (≥ 992px) -->
+  <div class="col-lg-3 d-none d-lg-block mb-4">
+    <div class="p-3" style="background: var(--panel); border: 1px solid var(--line);">
+      <h5 class="text-white mb-3">ФИЛЬТРЫ</h5>
+      <form method="get" id="filter-form-desktop">
+        <input type="text" name="q" class="form-control mb-3" placeholder="Поиск..." value="{{ request.GET.q }}">
 
-                <!-- Атрибуты (из вашего View) -->
-                {% for attr_data in filter_attributes %}
-                <h6 class="text-lime mt-4">{{ attr_data.attribute.name }}</h6>
-                {% for val in attr_data.values %}
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="attr_{{ attr_data.attribute.slug }}" value="{{ val }}" id="attr-{{ attr_data.attribute.slug }}-{{ forloop.counter }}" {% if val in selected_attrs|default:'' %}checked{% endif %}>
-                    <label class="form-check-label text-white" for="attr-{{ attr_data.attribute.slug }}-{{ forloop.counter }}">{{ val }}</label>
-                </div>
-                {% endfor %}
-                {% endfor %}
-
-                <button type="submit" class="btn btn-lime w-100 mt-4">ПРИМЕНИТЬ</button>
-            </form>
+        <h6 class="text-lime mt-4">Бренды</h6>
+        {% for brand in brands %}
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="brand" value="{{ brand.slug }}"
+                 id="d-brand-{{ brand.id }}" {% if brand.slug in selected_brands %}checked{% endif %}>
+          <label class="form-check-label text-white" for="d-brand-{{ brand.id }}">{{ brand.name }}</label>
         </div>
+        {% endfor %}
+
+        {% for attr_data in filter_attributes %}
+        <h6 class="text-lime mt-4">{{ attr_data.attribute.name }}</h6>
+        {% for val in attr_data.values %}
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox"
+                 name="attr_{{ attr_data.attribute.slug }}" value="{{ val }}"
+                 id="d-attr-{{ attr_data.attribute.slug }}-{{ forloop.counter }}"
+                 {% for k, v_list in request.GET.lists %}{% if k == "attr_"|add:attr_data.attribute.slug and val in v_list %}checked{% endif %}{% endfor %}>
+          <label class="form-check-label text-white" for="d-attr-{{ attr_data.attribute.slug }}-{{ forloop.counter }}">{{ val }}</label>
+        </div>
+        {% endfor %}
+        {% endfor %}
+
+        <button type="submit" class="btn btn-lime w-100 mt-4">ПРИМЕНИТЬ</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Правая колонка (продукты) -->
+  <div class="col-12 col-lg-9">
+    <!-- Desktop header (≥ 992px) — как было -->
+    <div class="d-none d-lg-flex justify-content-between align-items-center mb-4">
+      <h2 class="text-white m-0">КАТАЛОГ</h2>
+      <form method="get" class="d-flex align-items-center gap-2">
+        <span class="text-muted small">Сортировка:</span>
+        <select name="sort" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+          <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Новинки</option>
+          <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>Сначала дешевле</option>
+          <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>Сначала дороже</option>
+        </select>
+        {% for k, v_list in request.GET.lists %}
+          {% if k != 'sort' and k != 'page' %}
+            {% for v in v_list %}
+              <input type="hidden" name="{{ k }}" value="{{ v }}">
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+      </form>
+    </div>
+
+    <!-- Mobile header + toolbar (< 992px) -->
+    <div class="d-lg-none mb-3">
+      <h2 class="text-white m-0 mb-2" style="font-size: 1.4rem;">КАТАЛОГ</h2>
+      <div class="catalog-toolbar">
+        <div class="catalog-toolbar__sort">
+          <select id="sort-select-mobile" class="form-select" onchange="sortByValue(this.value)" aria-label="Сортировка">
+            <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Новинки</option>
+            <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>Сначала дешевле</option>
+            <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>Сначала дороже</option>
+          </select>
+        </div>
+        <button type="button" class="btn btn-outline-lime catalog-toolbar__filter-btn"
+                data-bs-toggle="offcanvas" data-bs-target="#mobileFilters" aria-controls="mobileFilters">
+          <i class="bi bi-funnel"></i>
+          <span>Фильтры</span>
+          {% if selected_brands or selected_categories or selected_attrs %}
+            <span class="badge" aria-label="Активные фильтры">!</span>
+          {% endif %}
+        </button>
+      </div>
     </div>
 
     <!-- Сетка товаров -->
-    <div class="col-md-9">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="text-white m-0">КАТАЛОГ</h2>
-            <!-- Сортировка -->
-            <form method="get" class="d-flex align-items-center gap-2">
-                <span class="text-muted small">Сортировка:</span>
-                <select name="sort" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
-                    <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Новинки</option>
-                    <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>Сначала дешевле</option>
-                    <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>Сначала дороже</option>
-                </select>
-                <!-- Скрытые поля для сохранения фильтров при сортировке -->
-                {% for k, v in request.GET.items %}
-                    {% if k != 'sort' and k != 'page' %}
-                        <input type="hidden" name="{{ k }}" value="{{ v }}">
-                    {% endif %}
-                {% endfor %}
-            </form>
-        </div>
-
-        <div class="row g-4">
-            {% for product in products %}
-            <div class="col-6 col-lg-4">
-                <div class="product-card">
-                    {% if product.main_image %}
-                        <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
-                    {% else %}
-                        <div style="height: 200px; background: #222;"></div>
-                    {% endif %}
-                    <div class="card-body">
-                        <span class="text-muted small">{{ product.category.name }}</span>
-                        <h5 class="text-white mt-1 mb-3">
-                            <a href="{{ product.get_absolute_url }}" class="text-white text-decoration-none">{{ product.name }}</a>
-                        </h5>
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <span class="price">{{ product.price }} ₽</span>
-                            <form action="{% url 'cart:add_to_cart' product.id %}" method="post" class="ajax-add-to-cart">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-lime">В КОРЗИНУ</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+    <div class="row g-3 g-lg-4">
+      {% for product in products %}
+      <div class="col-6 col-lg-4">
+        <div class="product-card">
+          {% if product.main_image %}
+            <img src="{{ product.main_image.url }}" alt="{{ product.name }}" loading="lazy">
+          {% else %}
+            <div style="height: 200px; background: #222;"></div>
+          {% endif %}
+          <div class="card-body">
+            <span class="text-muted small">{{ product.category.name }}</span>
+            <h5 class="text-white mt-1 mb-3">
+              <a href="{{ product.get_absolute_url }}" class="text-white text-decoration-none">{{ product.name }}</a>
+            </h5>
+            <div class="d-flex justify-content-between align-items-center mt-auto">
+              <span class="price">{{ product.price }} ₽</span>
+              <form action="{% url 'cart:add_to_cart' product.id %}" method="post" class="ajax-add-to-cart">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-lime btn-add-to-cart" aria-label="Добавить в корзину">
+                  <span class="btn-label-text">В КОРЗИНУ</span>
+                  <i class="bi bi-cart-plus d-lg-none"></i>
+                </button>
+              </form>
             </div>
-            {% empty %}
-            <div class="col-12 text-center py-5">
-                <h4 class="text-muted">По вашему запросу ничего не найдено</h4>
-            </div>
-            {% endfor %}
+          </div>
         </div>
-
-        <!-- Пагинация (упрощенная) -->
-        {% if is_paginated %}
-        <nav class="mt-5">
-            <ul class="pagination justify-content-center">
-                {% if page_obj.has_previous %}
-                    <li class="page-item"><a class="page-link bg-dark text-lime border-dark" href="?page={{ page_obj.previous_page_number }}{{ filter_params }}">Назад</a></li>
-                {% endif %}
-                <li class="page-item disabled"><span class="page-link bg-dark text-white border-dark">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
-                {% if page_obj.has_next %}
-                    <li class="page-item"><a class="page-link bg-dark text-lime border-dark" href="?page={{ page_obj.next_page_number }}{{ filter_params }}">Вперед</a></li>
-                {% endif %}
-            </ul>
-        </nav>
-        {% endif %}
+      </div>
+      {% empty %}
+      <div class="col-12 catalog-empty">
+        <i class="bi bi-search catalog-empty__icon"></i>
+        <h4 class="text-muted">По вашему запросу ничего не найдено</h4>
+        <a href="{% url 'catalog:product_list' %}" class="btn btn-outline-lime mt-3">Сбросить фильтры</a>
+      </div>
+      {% endfor %}
     </div>
+
+    <!-- Пагинация -->
+    {% if is_paginated %}
+    <nav class="mt-4 mt-lg-5 catalog-pagination" aria-label="Постраничная навигация">
+      <ul class="pagination justify-content-center mb-0">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link bg-dark text-lime border-dark"
+               href="?page={{ page_obj.previous_page_number }}&sort={{ current_sort }}{% if filter_params %}&{{ filter_params }}{% endif %}">Назад</a>
+          </li>
+        {% endif %}
+        <li class="page-item disabled">
+          <span class="page-link bg-dark text-white border-dark">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        </li>
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link bg-dark text-lime border-dark"
+               href="?page={{ page_obj.next_page_number }}&sort={{ current_sort }}{% if filter_params %}&{{ filter_params }}{% endif %}">Вперед</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
 </div>
+
+<!-- Offcanvas-фильтры (только мобилка) -->
+<div class="offcanvas offcanvas-start mobile-filters d-lg-none" tabindex="-1" id="mobileFilters" aria-labelledby="mobileFiltersLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title m-0" id="mobileFiltersLabel">Фильтры</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Закрыть"></button>
+  </div>
+  <div class="offcanvas-body">
+    <form method="get" id="filter-form-mobile">
+      <input type="text" name="q" class="form-control mb-3" placeholder="Поиск..." value="{{ request.GET.q }}">
+
+      <h6 class="text-lime mt-4">Бренды</h6>
+      {% for brand in brands %}
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="brand" value="{{ brand.slug }}"
+               id="m-brand-{{ brand.id }}" {% if brand.slug in selected_brands %}checked{% endif %}>
+        <label class="form-check-label text-white" for="m-brand-{{ brand.id }}">{{ brand.name }}</label>
+      </div>
+      {% endfor %}
+
+      {% for attr_data in filter_attributes %}
+      <h6 class="text-lime mt-4">{{ attr_data.attribute.name }}</h6>
+      {% for val in attr_data.values %}
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox"
+               name="attr_{{ attr_data.attribute.slug }}" value="{{ val }}"
+               id="m-attr-{{ attr_data.attribute.slug }}-{{ forloop.counter }}"
+               {% for k, v_list in request.GET.lists %}{% if k == "attr_"|add:attr_data.attribute.slug and val in v_list %}checked{% endif %}{% endfor %}>
+        <label class="form-check-label text-white" for="m-attr-{{ attr_data.attribute.slug }}-{{ forloop.counter }}">{{ val }}</label>
+      </div>
+      {% endfor %}
+      {% endfor %}
+
+      <button type="submit" class="btn btn-lime w-100 mt-4">ПРИМЕНИТЬ</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+  function sortByValue(sortVal) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('sort', sortVal);
+    url.searchParams.delete('page');
+    window.location.href = url.toString();
+  }
+</script>
 {% endblock %}

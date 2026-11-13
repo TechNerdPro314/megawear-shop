@@ -23,7 +23,7 @@ class CheckoutForm(forms.ModelForm):
     payment_method = forms.ChoiceField(
         choices=Order.PAYMENT_METHODS,
         widget=forms.RadioSelect(),
-        initial='online',
+        initial='card',
         label='Способ оплаты'
     )
 

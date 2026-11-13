@@ -3,7 +3,7 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#080909">
     
     <title>{% block title %}{{ seo_meta.title|default:"NFWEAR | Оптовая одежда" }}{% endblock %}</title>
@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="{% static 'css/theme.css' %}">
     
     <style>
+        /* ===== Общие иконки ===== */
         .header-icon-btn {
             color: var(--white);
             font-size: 1.3rem;
@@ -28,46 +29,102 @@
             align-items: center;
             justify-content: center;
             text-decoration: none;
+            min-width: 44px;
+            min-height: 44px;
+            /* Сброс стандартных стилей кнопки (исправляет белый квадрат) */
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            outline: none !important;
+            box-shadow: none !important;
         }
         .header-icon-btn:hover, .header-icon-btn:focus {
             color: var(--lime);
         }
-        .header-icon-badge {
-            position: absolute;
-            top: -5px;
-            right: -8px;
-            font-size: 0.6rem;
-            padding: 2px 5px;
-        }
+
+        /* ===== Поиск ===== */
         .header-search {
             background-color: var(--panel);
             border: 1px solid var(--line);
             color: var(--white);
             border-radius: 4px;
-            padding: 6px 12px;
-            font-size: 14px;
-            max-width: 250px;
+            padding: 8px 12px;
+            font-size: 15px;
+            width: 100%;
+            max-width: 320px;
         }
         .header-search:focus {
             outline: none;
             border-color: var(--lime);
         }
-        .dropdown-menu {
-            background-color: var(--panel);
-            border: 1px solid var(--line);
-            min-width: 280px;
+
+        /* ===== Верхняя плашка ===== */
+        .top-bar {
+            font-size: 12px;
+            padding: 6px 8px;
+            line-height: 1.2;
         }
-        .dropdown-item {
+        @media (max-width: 575.98px) {
+            .top-bar { font-size: 11px; letter-spacing: 0.2px; }
+        }
+
+        /* ===== Хедер ===== */
+        .site-header .container {
+            gap: 8px;
+        }
+        .brand-logo {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            transform: skewX(-10deg);
+            line-height: 1;
+        }
+        @media (min-width: 576px) {
+            .brand-logo { font-size: 2.2rem; }
+        }
+
+        /* ===== Кнопка-бургер ===== */
+        .burger-btn {
             color: var(--white);
-            font-size: 14px;
-            white-space: normal;
+            font-size: 1.6rem;
+            background: transparent;
+            border: none;
+            padding: 0;
+            min-width: 44px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            outline: none;
         }
-        .dropdown-item:hover {
-            background-color: #1a1c16;
+        .burger-btn:hover, .burger-btn:focus { color: var(--lime); }
+
+        /* ===== Offcanvas-меню (мобильная навигация) ===== */
+        .offcanvas.mobile-nav {
+            background-color: var(--panel);
+            color: var(--white);
+            width: min(320px, 85vw);
+        }
+        .offcanvas.mobile-nav .offcanvas-header {
+            border-bottom: 1px solid var(--line);
+        }
+        .offcanvas.mobile-nav .offcanvas-title {
+            font-family: 'Oswald', sans-serif;
+            letter-spacing: -0.5px;
+        }
+        .offcanvas.mobile-nav .nav-link {
+            color: var(--white);
+            font-size: 1.05rem;
+            padding: 14px 4px;
+            border-bottom: 1px solid var(--line);
+        }
+        .offcanvas.mobile-nav .nav-link:hover,
+        .offcanvas.mobile-nav .nav-link:focus {
             color: var(--lime);
         }
-        .dropdown-divider { border-color: var(--line); }
-        
+
+        /* ===== Сообщения ===== */
         .django-alert {
             background-color: var(--panel);
             border: 1px solid var(--lime);
@@ -75,72 +132,71 @@
             border-left: 5px solid var(--lime);
         }
         .django-alert.alert-danger { border-color: #ff4444; border-left-color: #ff4444; }
+
+        /* ===== Хлебные крошки ===== */
+        .breadcrumbs {
+            font-size: 13px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        @media (min-width: 768px) {
+            .breadcrumbs { font-size: 14px; }
+        }
+
+        /* ===== Футер ===== */
+        .site-footer { background-color: var(--panel) !important; }
+        .site-footer .footer-brand {
+            font-family: 'Oswald', sans-serif;
+            transform: skewX(-10deg);
+            font-size: 1.3rem;
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
 <div class="top-bar text-center">
-    ОПТОВАЯ ОДЕЖДА · ДОСТАВКА ПО РОССИИ · НАДЕЖНЫЙ ПОСТАВЩИК
+    <span class="d-none d-sm-inline">ОПТОВАЯ ОДЕЖДА · ДОСТАВКА ПО РОССИИ · НАДЕЖНЫЙ ПОСТАВЩИК</span>
+    <span class="d-sm-none">ОПТОВАЯ ОДЕЖДА · ДОСТАВКА ПО РФ</span>
 </div>
 
-<header class="site-header py-3 mb-4 sticky-top">
-    <div class="container d-flex align-items-center justify-content-between flex-wrap gap-3">
-        
+<header class="site-header py-2 py-md-3 mb-3 mb-md-4 sticky-top">
+    <div class="container d-flex align-items-center justify-content-between gap-2">
+
+        {# Бургер — только на мобильных/планшетах #}
+        <button class="burger-btn d-xl-none" type="button"
+                data-bs-toggle="offcanvas" data-bs-target="#mobileNav"
+                aria-controls="mobileNav" aria-label="Меню">
+            <i class="bi bi-list"></i>
+        </button>
+
         <a href="{% url 'catalog:home' %}" class="text-decoration-none d-flex align-items-center">
-            <h2 class="m-0 text-white" style="font-family: 'Oswald'; font-size: 2.2rem; font-weight: 700; letter-spacing: -1px; transform: skewX(-10deg);">
+            <span class="brand-logo text-white m-0">
                 MEGA<span class="text-lime">WEAR</span>
-            </h2>
+            </span>
         </a>
-        
+
+        {# Desktop-навигация #}
         <nav class="d-none d-xl-flex gap-4">
             <a href="{% url 'catalog:home' %}" class="nav-link">Главная</a>
             <a href="{% url 'catalog:product_list' %}" class="nav-link">Каталог</a>
-            <a href="{% url 'info_delivery' %}" class="nav-link">Доставка</a>
-            <a href="{% url 'info_contacts' %}" class="nav-link">Контакты</a>
         </nav>
 
-        <div class="d-flex align-items-center gap-3 gap-md-4">
-            
+        <div class="d-flex align-items-center gap-1 gap-md-2">
+
+            {# Поиск: на десктопе в хедере #}
             <form action="{% url 'catalog:product_list' %}" method="get" class="d-none d-md-block">
                 <input type="text" name="q" class="header-search" placeholder="Поиск товаров..." value="{{ request.GET.q }}">
             </form>
 
-            <div class="d-flex align-items-center gap-3">
-                <!-- УВЕДОМЛЕНИЯ -->
-                <div class="dropdown" id="notificationsDropdown">
-                    <a href="#" class="header-icon-btn" id="notifBtn" title="Уведомления">
-                        <i class="bi bi-bell"></i>
-                        {% if user.is_authenticated %}
-                            <span class="badge bg-danger rounded-pill header-icon-badge">3</span>
-                        {% endif %}
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow" id="notifMenu">
-                        <li><h6 class="dropdown-header text-muted text-uppercase">Уведомления</h6></li>
-                        
-                        {% if user.is_authenticated %}
-                            <li><a class="dropdown-item" href="{% url 'users:profile' %}">Ваш заказ №123 отправлен</a></li>
-                            <li><a class="dropdown-item" href="{% url 'catalog:product_list' %}">Скидка 10% на следующий заказ</a></li>
-                            <li><a class="dropdown-item" href="{% url 'catalog:product_list' %}">Новые поступления</a></li>
-                        {% else %}
-                            <li><a class="dropdown-item" href="{% url 'users:login' %}?next={{ request.path }}">Войдите, чтобы видеть уведомления</a></li>
-                        {% endif %}
-                        
-                        <li><hr class="dropdown-divider"></li>
-                        {% if user.is_authenticated %}
-                            <li><a class="dropdown-item text-lime fw-bold" href="{% url 'users:profile' %}">Перейти в профиль</a></li>
-                        {% else %}
-                            <li><a class="dropdown-item text-lime fw-bold" href="{% url 'users:login' %}?next={{ request.path }}">Войти в аккаунт</a></li>
-                        {% endif %}
-                    </ul>
-                </div>
-                
-                <a href="/comparison/" class="header-icon-btn d-none d-sm-flex" title="Сравнение цен">
-                    <i class="bi bi-bar-chart-steps"></i>
-                </a>
-            </div>
+            {# Кнопка-иконка поиска для мобилы — открывает поиск в offcanvas #}
+            <button class="header-icon-btn d-md-none" type="button"
+                    data-bs-toggle="offcanvas" data-bs-target="#mobileSearch"
+                    aria-controls="mobileSearch" aria-label="Поиск">
+                <i class="bi bi-search"></i>
+            </button>
 
-            <div class="d-flex align-items-center gap-2 border-start ps-3" style="border-color: var(--line) !important;">
+            <div class="d-flex align-items-center gap-1 border-start ps-2 ps-md-3" style="border-color: var(--line) !important;">
                 {% if user.is_authenticated %}
                     <a href="{% url 'users:profile' %}" class="header-icon-btn" title="Личный кабинет">
                         <i class="bi bi-person-circle"></i>
@@ -152,7 +208,7 @@
                 {% endif %}
             </div>
 
-            <a href="{% url 'cart:cart_detail' %}" class="btn btn-outline-lime position-relative d-flex align-items-center gap-2 py-2 ms-1">
+            <a href="{% url 'cart:cart_detail' %}" class="btn btn-outline-lime position-relative d-flex align-items-center gap-1 gap-sm-2 py-2 px-2 px-sm-3">
                 <i class="bi bi-cart3"></i>
                 <span class="d-none d-sm-block">Корзина</span>
                 <span id="cart-badge" class="badge rounded-pill {% if global_cart.get_total_quantity > 0 %}bg-danger text-white{% else %}bg-secondary text-dark{% endif %}" style="font-size: 0.75rem;">
@@ -162,6 +218,50 @@
         </div>
     </div>
 </header>
+
+{# ===== Offcanvas: мобильное меню ===== #}
+<div class="offcanvas offcanvas-start mobile-nav" tabindex="-1" id="mobileNav" aria-labelledby="mobileNavLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="mobileNavLabel">
+            MEGA<span class="text-lime">WEAR</span>
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Закрыть"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column">
+        <nav class="nav flex-column">
+            <a href="{% url 'catalog:home' %}" class="nav-link">Главная</a>
+            <a href="{% url 'catalog:product_list' %}" class="nav-link">Каталог</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'users:profile' %}" class="nav-link">Личный кабинет</a>
+                <a href="{% url 'users:logout' %}" class="nav-link">Выйти</a>
+            {% else %}
+                <a href="{% url 'users:login' %}" class="nav-link">Войти</a>
+                <a href="{% url 'users:register' %}" class="nav-link">Регистрация</a>
+            {% endif %}
+        </nav>
+        <div class="mt-auto pt-4 small text-muted">
+            <a href="https://t.me/pohyist177" target="_blank" class="text-lime text-decoration-none">Telegram ↗</a>
+        </div>
+    </div>
+</div>
+
+{# ===== Offcanvas: мобильный поиск ===== #}
+<div class="offcanvas offcanvas-top" tabindex="-1" id="mobileSearch" aria-labelledby="mobileSearchLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="mobileSearchLabel">Поиск</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Закрыть"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form action="{% url 'catalog:product_list' %}" method="get">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Что ищем?" value="{{ request.GET.q }}" autofocus style="font-size: 16px;">
+                <button class="btn btn-lime" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 {% if messages %}
 <div class="container mt-2">
@@ -174,9 +274,9 @@
 </div>
 {% endif %}
 
-<main class="container flex-grow-1">
+<main class="container flex-grow-1 px-3 px-md-3">
     {% if breadcrumbs_items %}
-    <div class="breadcrumbs mb-4">
+    <div class="breadcrumbs mb-3 mb-md-4">
         {% for crumb in breadcrumbs_items %}
             {% if crumb.url %}
                 <a href="{{ crumb.url }}">{{ crumb.name }}</a> <span class="mx-1">/</span>
@@ -190,15 +290,16 @@
     {% block content %}{% endblock %}
 </main>
 
-<footer class="border-top mt-5 py-4" style="border-color: var(--line) !important; background-color: var(--panel) !important;">
-    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center text-muted">
-        <div class="d-flex align-items-center gap-3 mb-3 mb-md-0">
-            <h4 class="m-0 text-white" style="font-family: Oswald; transform: skewX(-10deg);">MEGA<span class="text-lime">WEAR</span></h4>
-            <span>© {% now "Y" %} Все права защищены.</span>
-        </div>
-        <div class="d-flex gap-4">
-            <a href="{% url 'info_contacts' %}" class="text-muted text-decoration-none">Контакты</a>
-            <a href="https://t.me/pohyist177" target="_blank" class="text-lime text-decoration-none">Telegram ↗</a>
+<footer class="site-footer border-top mt-4 mt-md-5 py-4" style="border-color: var(--line) !important;">
+    <div class="container">
+        <div class="row align-items-center gy-3 text-center text-md-start">
+            <div class="col-12 col-md-6 d-flex flex-column flex-md-row align-items-center gap-2 gap-md-3">
+                <span class="footer-brand text-white m-0">MEGA<span class="text-lime">WEAR</span></span>
+                <span class="small">© {% now "Y" %} Все права защищены.</span>
+            </div>
+            <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-end gap-4 small">
+                <a href="https://t.me/pohyist177" target="_blank" class="text-lime text-decoration-none">Telegram ↗</a>
+            </div>
         </div>
     </div>
 </footer>
@@ -207,33 +308,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Резервный скрипт для уведомлений (на случай если Bootstrap JS не сработает)
-    const notifBtn = document.getElementById('notifBtn');
-    const notifMenu = document.getElementById('notifMenu');
-    
-    if (notifBtn && notifMenu) {
-        notifBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (!notifMenu.classList.contains('show')) {
-                notifMenu.classList.add('show');
-                notifMenu.style.display = 'block';
-                notifMenu.style.position = 'absolute';
-                notifMenu.style.transform = 'translate3d(-200px, 40px, 0px)';
-            } else {
-                notifMenu.classList.remove('show');
-                notifMenu.style.display = 'none';
-            }
-        });
 
-        document.addEventListener('click', function(e) {
-            if (!notifBtn.contains(e.target) && !notifMenu.contains(e.target)) {
-                notifMenu.classList.remove('show');
-                notifMenu.style.display = 'none';
-            }
-        });
-    }
-
-    // AJAX корзина
+    // ===== AJAX корзина =====
     async function sendAjaxForm(form, url) {
         const formData = new FormData(form);
         try {
@@ -253,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     cartBadge.className = `badge rounded-pill ${data.total_quantity > 0 ? 'bg-danger text-white' : 'bg-secondary text-dark'}`;
                 }
                 if (window.location.pathname.includes('/cart/')) {
-                    window.location.reload(); 
+                    window.location.reload();
                 } else {
                     showToast(data.message || 'Товар добавлен в корзину!');
                 }
@@ -265,21 +341,29 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // ===== Toast =====
     function showToast(message, type = 'success') {
         let container = document.getElementById('toast-container');
         if (!container) {
             container = document.createElement('div');
             container.id = 'toast-container';
-            container.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 9999;';
+            // На мобиле — на всю ширину снизу, на десктопе — справа снизу
+            container.style.cssText = 'position: fixed; bottom: 16px; left: 16px; right: 16px; z-index: 9999; display: flex; flex-direction: column; align-items: stretch; gap: 8px;';
+            if (window.innerWidth >= 576) {
+                container.style.left = 'auto';
+                container.style.right = '20px';
+                container.style.maxWidth = '360px';
+            }
             document.body.appendChild(container);
         }
         const toast = document.createElement('div');
-        toast.style.cssText = `background: ${type === 'success' ? 'var(--lime)' : '#ff4444'}; color: #080909; padding: 12px 24px; border-radius: 4px; font-weight: bold; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); transition: opacity 0.3s; text-transform: uppercase; font-family: 'Roboto Condensed';`;
+        toast.style.cssText = `background: ${type === 'success' ? 'var(--lime)' : '#ff4444'}; color: #080909; padding: 12px 16px; border-radius: 4px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.5); transition: opacity 0.3s; text-transform: uppercase; font-family: 'Roboto Condensed', sans-serif; font-size: 14px;`;
         toast.textContent = message;
         container.appendChild(toast);
         setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
     }
 
+    // ===== AJAX-добавление в корзину =====
     document.querySelectorAll('.ajax-add-to-cart').forEach(form => {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
